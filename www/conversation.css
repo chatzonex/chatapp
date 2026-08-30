@@ -1,0 +1,1579 @@
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+.conv-shell {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+}
+
+/* ===== Top Bar ===== */
+.conv-topbar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 14px 12px;
+    padding-top: max(14px, env(safe-area-inset-top));
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--glass-border);
+    background: var(--bg);
+    z-index: 10;
+}
+
+.conv-back-btn {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 50%;
+    color: var(--text);
+    transition: background 0.2s ease, transform 0.15s ease;
+    flex-shrink: 0;
+    order: 1;
+}
+
+.conv-back-btn:active {
+    transform: scale(0.92);
+    background: var(--glass-strong);
+}
+
+/* RTL: back arrow points right (توي زر الرجوع بيبقى أقصى اليمين البصري
+   لأن الصفحة RTL، بس منطقياً هو "الأول" على يمين المستخدم). في LTR
+   بيتقلب تلقائي مع اتجاه الصفحة. */
+.conv-back-btn svg {
+    transform: scaleX(var(--dir-flip, 1));
+}
+
+html[dir="rtl"] .conv-back-btn svg {
+    --dir-flip: -1;
+}
+
+.conv-identity {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-align: center;
+    order: 2;
+    cursor: pointer;
+}
+
+.conv-avatar {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 50%;
+    background: #16181B;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.conv-avatar-icon {
+    width: 60%;
+    height: 60%;
+    color: #9BA0A6;
+}
+
+.conv-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.conv-identity-text {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.conv-name {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.conv-status {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.conv-status.is-online {
+    color: var(--accent);
+}
+
+/* زرار التلت نقط (خيارات الشات) — نفس عرض زرار الرجوع عشان الاسم يفضل
+   في المنتصف بالظبط، وبيفتح قايمة زي اللي في الصفحة الرئيسية */
+.conv-menu-btn {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 50%;
+    color: var(--text);
+    transition: background 0.2s ease, transform 0.15s ease;
+    flex-shrink: 0;
+    order: 3;
+}
+
+.conv-menu-btn:active {
+    transform: scale(0.92);
+    background: var(--glass-strong);
+}
+
+.conv-menu-btn .dots {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.conv-menu-btn .dots span {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+/* ===== بابل About — نازلة من تحت البار العلوي جنب زرار الرجوع،
+   وبتظهر مرة واحدة بس أول ما الشات يتفتح لو الطرف التاني كاتب About ===== */
+.conv-about-toast {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 12px;
+    max-width: 78%;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: rgba(21, 26, 32, 0.92);
+    backdrop-filter: blur(20px) saturate(1.6);
+    -webkit-backdrop-filter: blur(20px) saturate(1.6);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 16px;
+    padding: 10px 14px;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+    z-index: 12;
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+html[dir="ltr"] .conv-about-toast {
+    right: auto;
+    left: 12px;
+}
+
+.conv-about-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.conv-about-toast-avatar {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    border-radius: 50%;
+    background: #16181B;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+    color: #9BA0A6;
+}
+
+.conv-about-toast-avatar svg {
+    width: 60%;
+    height: 60%;
+}
+
+.conv-about-toast-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.conv-about-toast-text {
+    min-width: 0;
+}
+
+.conv-about-toast-name {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+}
+
+.conv-about-toast-body {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+/* ===== Fullscreen photo viewer — ضغطة مطولة على أي صورة بروفايل
+   بتفتحها كاملة قدام المستخدم ===== */
+.photo-viewer-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 950;
+    background: rgba(0, 0, 0, 0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.photo-viewer-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.photo-viewer-img {
+    max-width: 92vw;
+    max-height: 82vh;
+    border-radius: 12px;
+    object-fit: contain;
+}
+
+.photo-viewer-close {
+    position: absolute;
+    top: max(18px, env(safe-area-inset-top));
+    right: 18px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* ===== شريط وضع التحديد المتعدد (بيحل محل الـ topbar العادي) ===== */
+.conv-topbar-select {
+    display: none;
+}
+
+body.select-mode-on .conv-topbar-select {
+    display: flex;
+}
+
+body.select-mode-on #convTopbarNormal {
+    display: none;
+}
+
+.conv-select-count {
+    flex: 1;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    order: 2;
+}
+
+.conv-select-delete-btn {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 50%;
+    color: #F87171;
+    transition: background 0.2s ease, transform 0.15s ease;
+    flex-shrink: 0;
+    order: 3;
+}
+
+.conv-select-delete-btn:active {
+    transform: scale(0.92);
+    background: var(--glass-strong);
+}
+
+.conv-select-delete-btn:disabled {
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+/* ===== دايرة اختيار صغيرة بتظهر على كل رسالة وإحنا في وضع التحديد ===== */
+.msg-row-select-dot {
+    display: none;
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--glass-border);
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    margin: 0 8px;
+    flex-shrink: 0;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+body.select-mode-on .msg-row-select-dot {
+    display: flex;
+}
+
+.msg-row-select-dot svg {
+    width: 13px;
+    height: 13px;
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 0.12s ease, transform 0.12s ease;
+    stroke: #fff;
+}
+
+.msg-row.multi-selected .msg-row-select-dot {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.msg-row.multi-selected .msg-row-select-dot svg {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* وإحنا في وضع التحديد، الصف بيتفرد أكتر عشان الدايرة تاخد مكانها
+   جنب الفقاعة، بدل ما تتراكب فوقها */
+body.select-mode-on .msg-row-inner {
+    display: flex;
+    align-items: flex-end;
+}
+
+body.select-mode-on .msg-row.from-me .msg-row-inner {
+    flex-direction: row-reverse;
+}
+
+/* ===== Messages Area ===== */
+.conv-messages {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    scroll-behavior: smooth;
+}
+
+.conv-day-divider {
+    align-self: center;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text-faint);
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    padding: 5px 14px;
+    border-radius: 999px;
+    margin: 10px 0;
+}
+
+/* ===== Message Bubbles ===== */
+.msg-row {
+    display: flex;
+    width: 100%;
+    /* بنثبّت اتجاه الصف LTR دايماً بغض النظر عن لغة الواجهة، عشان "رسايلي
+       أنا" تفضل دايماً يمين و"رسايل التاني" تفضل دايماً شمال — زي أي أبب
+       شات معروف — من غير ما اتجاه RTL/LTR بتاع الصفحة يقلب المكان */
+    direction: ltr;
+}
+
+.msg-row.from-me {
+    justify-content: flex-end;
+}
+
+.msg-row.from-them {
+    justify-content: flex-start;
+}
+
+/* ===== System Messages (زي "فلان غيّر لون الفقاعات") ===== */
+.msg-row-system {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin: 10px 0;
+}
+
+.msg-row-system-badge {
+    max-width: 82%;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: var(--glass-strong, rgba(255, 255, 255, 0.08));
+    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
+    color: var(--text-dim, #8A9691);
+    font-size: 12px;
+    line-height: 1.4;
+    text-align: center;
+    animation: bubbleIn 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bubble {
+    position: relative;
+    max-width: 78%;
+    min-width: 64px;
+    box-sizing: border-box;
+    animation: bubbleIn 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    /* فقاعة CSS نضيفة بالكامل — من غير أي صور، خلفية بيضا وزوايا دائرية
+       وذيل صغير مرسوم بـ ::before */
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 8px 12px 7px;
+    /* بيمنع تحديد النص الأزرق الافتراضي بتاع المتصفح وقت الضغطة
+       المطولة (بديل النسخ بقى زرار "نسخ" جوه القايمة نفسها) */
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+
+@keyframes bubbleIn {
+    from { opacity: 0; transform: translateY(6px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* الفقاعة الخاصة برسائلي أنا (يمين) — شكل الذيل نفسه اتنقل بالكامل
+   لملف chatzone-extra.css (بيتحمّل بعد الملف ده)، عشان يبقى مكانه
+   الطبيعي مع باقي إضافات الشات */
+.bubble.bubble-right {
+    margin-inline-start: 54px;
+    border-bottom-right-radius: 4px;
+}
+
+/* الفقاعة الخاصة برسائل الطرف التاني (شمال) */
+.bubble.bubble-left {
+    margin-inline-end: 54px;
+    border-bottom-left-radius: 4px;
+}
+
+.bubble-text {
+    font-size: 14.5px;
+    line-height: 1.5;
+    color: #10161A;
+    word-break: break-word;
+    white-space: pre-wrap;
+    position: relative;
+    z-index: 1;
+    /* النص بيدي اتجاهه الطبيعي تلقائياً (عربي RTL / إنجليزي LTR) حسب
+       محتواه، حتى لو صف الفقاعة نفسه بره ثابت LTR */
+    unicode-bidi: plaintext;
+}
+
+.bubble-meta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    margin-top: 3px;
+    direction: ltr;
+    position: relative;
+    z-index: 1;
+}
+
+.bubble-time {
+    font-size: 10.5px;
+    color: rgba(16, 22, 26, 0.55);
+    font-weight: 500;
+}
+
+/* علامات الصح — نفس رسمة أيقونات iOS اللي وصلت من المستخدم بالظبط
+   (unsent / offline / unread / read_tick)، بدل الأشكال المرسومة يدويًا.
+   اللون بيتغيّر بـ background-color لأن العنصر شغال كـ mask. */
+.bubble-tick {
+    width: 17px;
+    height: 13.7px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bubble-tick.tick-unsent {
+    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 74 58'><path d='M 23.50 43.11 C18.79,41.06 17.50,38.22 17.50,29.92 C17.50,22.65 17.71,21.83 20.27,19.27 C22.84,16.71 23.64,16.50 31.00,16.50 C38.36,16.50 39.16,16.71 41.73,19.27 C44.29,21.84 44.50,22.64 44.50,30.00 C44.50,37.34 44.29,38.17 41.76,40.69 C39.39,43.06 38.10,43.47 32.26,43.71 C28.54,43.86 24.60,43.59 23.50,43.11 ZM 39.17 38.35 C41.67,36.09 41.79,24.53 39.35,21.83 C37.09,19.33 25.53,19.21 22.83,21.65 C20.33,23.91 20.21,35.47 22.65,38.17 C24.91,40.67 36.47,40.79 39.17,38.35 ZM 29.00 28.00 C29.00,24.22 29.37,23.00 30.50,23.00 C31.55,23.00 32.00,24.06 32.00,26.50 C32.00,29.57 32.31,30.00 34.50,30.00 C36.06,30.00 37.00,30.57 37.00,31.50 C37.00,32.58 35.89,33.00 33.00,33.00 L 29.00 33.00 L 29.00 28.00 Z' fill='black'/></svg>");
+    mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 74 58'><path d='M 23.50 43.11 C18.79,41.06 17.50,38.22 17.50,29.92 C17.50,22.65 17.71,21.83 20.27,19.27 C22.84,16.71 23.64,16.50 31.00,16.50 C38.36,16.50 39.16,16.71 41.73,19.27 C44.29,21.84 44.50,22.64 44.50,30.00 C44.50,37.34 44.29,38.17 41.76,40.69 C39.39,43.06 38.10,43.47 32.26,43.71 C28.54,43.86 24.60,43.59 23.50,43.11 ZM 39.17 38.35 C41.67,36.09 41.79,24.53 39.35,21.83 C37.09,19.33 25.53,19.21 22.83,21.65 C20.33,23.91 20.21,35.47 22.65,38.17 C24.91,40.67 36.47,40.79 39.17,38.35 ZM 29.00 28.00 C29.00,24.22 29.37,23.00 30.50,23.00 C31.55,23.00 32.00,24.06 32.00,26.50 C32.00,29.57 32.31,30.00 34.50,30.00 C36.06,30.00 37.00,30.57 37.00,31.50 C37.00,32.58 35.89,33.00 33.00,33.00 L 29.00 33.00 L 29.00 28.00 Z' fill='black'/></svg>");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    background-color: rgba(16, 22, 26, 0.45);
+    width: 14.8px;
+    height: 14.8px;
+}
+
+.bubble-tick.tick-offline {
+    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 74 58'><path d='M 19.40 38.70 C14.20,33.86 13.70,33.06 14.93,31.58 C16.20,30.05 16.63,30.21 19.95,33.45 C21.95,35.40 24.06,37.00 24.65,37.00 C25.23,37.00 29.38,32.30 33.87,26.55 C38.35,20.81 42.42,15.86 42.90,15.56 C43.38,15.27 44.29,15.64 44.91,16.39 C45.81,17.48 44.02,20.36 36.39,30.13 C31.07,36.93 26.39,42.87 25.99,43.32 C25.58,43.78 22.62,41.70 19.40,38.70 Z' fill='black'/></svg>");
+    mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 74 58'><path d='M 19.40 38.70 C14.20,33.86 13.70,33.06 14.93,31.58 C16.20,30.05 16.63,30.21 19.95,33.45 C21.95,35.40 24.06,37.00 24.65,37.00 C25.23,37.00 29.38,32.30 33.87,26.55 C38.35,20.81 42.42,15.86 42.90,15.56 C43.38,15.27 44.29,15.64 44.91,16.39 C45.81,17.48 44.02,20.36 36.39,30.13 C31.07,36.93 26.39,42.87 25.99,43.32 C25.58,43.78 22.62,41.70 19.40,38.70 Z' fill='black'/></svg>");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    background-color: rgba(16, 22, 26, 0.45);
+    width: 17px;
+    height: 13.7px;
+}
+
+.bubble-tick.tick-unread {
+    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 74 58'><path d='M 19.40 38.70 C14.20,33.86 13.70,33.06 14.93,31.58 C16.20,30.05 16.63,30.21 19.95,33.45 C21.95,35.40 24.06,37.00 24.65,37.00 C25.23,37.00 29.38,32.30 33.87,26.55 C38.35,20.81 42.42,15.86 42.90,15.56 C43.38,15.27 44.29,15.64 44.92,16.40 C45.82,17.49 44.05,20.34 36.41,30.14 C31.10,36.94 26.42,42.87 26.01,43.32 C25.59,43.78 22.62,41.70 19.40,38.70 ZM 35.07 41.57 C32.23,38.55 32.89,35.68 36.23,36.52 C38.19,37.01 39.69,35.55 47.00,26.05 C51.68,19.98 55.78,15.00 56.13,15.00 C56.47,15.00 57.24,15.58 57.83,16.29 C58.64,17.27 56.46,20.73 48.87,30.54 C43.35,37.67 38.51,43.62 38.11,43.77 C37.71,43.92 36.34,42.93 35.07,41.57 Z' fill='black'/></svg>");
+    mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 74 58'><path d='M 19.40 38.70 C14.20,33.86 13.70,33.06 14.93,31.58 C16.20,30.05 16.63,30.21 19.95,33.45 C21.95,35.40 24.06,37.00 24.65,37.00 C25.23,37.00 29.38,32.30 33.87,26.55 C38.35,20.81 42.42,15.86 42.90,15.56 C43.38,15.27 44.29,15.64 44.92,16.40 C45.82,17.49 44.05,20.34 36.41,30.14 C31.10,36.94 26.42,42.87 26.01,43.32 C25.59,43.78 22.62,41.70 19.40,38.70 ZM 35.07 41.57 C32.23,38.55 32.89,35.68 36.23,36.52 C38.19,37.01 39.69,35.55 47.00,26.05 C51.68,19.98 55.78,15.00 56.13,15.00 C56.47,15.00 57.24,15.58 57.83,16.29 C58.64,17.27 56.46,20.73 48.87,30.54 C43.35,37.67 38.51,43.62 38.11,43.77 C37.71,43.92 36.34,42.93 35.07,41.57 Z' fill='black'/></svg>");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    background-color: rgba(16, 22, 26, 0.45);
+    width: 20.5px;
+    height: 16px;
+}
+
+.bubble-tick.tick-read {
+    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 74 58'><path d='M 19.35 38.74 C14.27,33.86 13.75,33.01 14.95,31.55 C16.20,30.06 16.65,30.23 19.95,33.45 C21.95,35.40 24.05,37.00 24.62,37.00 C25.19,37.00 29.14,32.53 33.41,27.06 C42.73,15.10 43.35,14.51 44.88,16.35 C45.78,17.44 44.03,20.30 36.43,30.12 C31.16,36.93 26.46,42.90 25.98,43.39 C25.48,43.90 22.67,41.93 19.35,38.74 ZM 35.07 41.57 C32.23,38.56 32.89,35.69 36.23,36.50 C38.18,36.98 39.71,35.48 47.00,26.03 C51.67,19.97 55.78,15.01 56.13,15.00 C56.47,15.00 57.24,15.58 57.83,16.29 C58.64,17.27 56.46,20.73 48.87,30.54 C43.35,37.67 38.51,43.62 38.11,43.77 C37.71,43.92 36.34,42.93 35.07,41.57 Z' fill='black'/></svg>");
+    mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 74 58'><path d='M 19.35 38.74 C14.27,33.86 13.75,33.01 14.95,31.55 C16.20,30.06 16.65,30.23 19.95,33.45 C21.95,35.40 24.05,37.00 24.62,37.00 C25.19,37.00 29.14,32.53 33.41,27.06 C42.73,15.10 43.35,14.51 44.88,16.35 C45.78,17.44 44.03,20.30 36.43,30.12 C31.16,36.93 26.46,42.90 25.98,43.39 C25.48,43.90 22.67,41.93 19.35,38.74 ZM 35.07 41.57 C32.23,38.56 32.89,35.69 36.23,36.50 C38.18,36.98 39.71,35.48 47.00,26.03 C51.67,19.97 55.78,15.01 56.13,15.00 C56.47,15.00 57.24,15.58 57.83,16.29 C58.64,17.27 56.46,20.73 48.87,30.54 C43.35,37.67 38.51,43.62 38.11,43.77 C37.71,43.92 36.34,42.93 35.07,41.57 Z' fill='black'/></svg>");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    background-color: var(--bubble-tick-read, #4FA3FF);
+    width: 20.5px;
+    height: 16px;
+}
+
+/* رسايل الطرف التاني معندهاش صح قراءة (الصح بتاعة رسايلي أنا بس) */
+.bubble-left .bubble-meta .bubble-tick {
+    display: none;
+}
+
+/* ===== Empty state ===== */
+.conv-empty {
+    margin: auto;
+    text-align: center;
+    color: var(--text-faint);
+    font-size: 13.5px;
+    padding: 40px 20px;
+}
+
+/* ===================================================
+   INPUT BAR — normal (docked) vs Liquid Glass (floating)
+=================================================== */
+
+.conv-input-area {
+    flex-shrink: 0;
+    padding: 10px 12px;
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+    border-top: 1px solid var(--glass-border);
+    background: var(--bg);
+    transition: all 0.4s ease;
+}
+
+.conv-input-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    background: var(--glass-strong);
+    border: 1px solid var(--glass-border);
+    border-radius: 22px;
+    padding: 6px 6px 6px 6px;
+    transition: background 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, border-radius 0.3s ease;
+}
+
+.conv-textarea {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14.5px;
+    line-height: 1.4;
+    resize: none;
+    max-height: 120px;
+    padding: 8px 10px;
+}
+
+.conv-textarea::placeholder {
+    color: var(--text-faint);
+}
+
+.conv-send-btn {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(150deg, #2FE08A, var(--whatsapp-green) 55%, #1AA855);
+    color: #06110C;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    box-shadow: 0 4px 14px rgba(37, 211, 102, 0.4);
+    transform: scale(0);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.18s ease;
+}
+
+/* زرار الإرسال يظهر بس لما فيه نص مكتوب */
+.conv-input-bar.has-text .conv-send-btn {
+    transform: scale(1);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.conv-send-btn svg {
+    width: 18px;
+    height: 18px;
+    transform: rotate(var(--send-rotate, 0deg));
+}
+
+html[dir="rtl"] .conv-send-btn svg {
+    --send-rotate: 180deg;
+}
+
+.conv-send-btn:active {
+    transform: scale(0.9);
+}
+
+/* ===== Liquid Glass mode: bar عايم بدل ما يكون ثابت تحت ===== */
+body.lg-chat-on .conv-input-area {
+    position: fixed;
+    left: 14px;
+    right: 14px;
+    bottom: max(18px, calc(env(safe-area-inset-bottom) + 10px));
+    max-width: 460px;
+    margin: 0 auto;
+    border-top: none;
+    background: transparent;
+    padding: 0;
+    z-index: 50;
+}
+
+body.lg-chat-on .conv-messages {
+    padding-bottom: 90px;
+}
+
+body.lg-chat-on .conv-input-bar {
+    background: rgba(27, 32, 39, 0.55);
+    backdrop-filter: blur(26px) saturate(1.7) brightness(1.12);
+    -webkit-backdrop-filter: blur(26px) saturate(1.7) brightness(1.12);
+    border-color: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 16px 46px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 999px;
+}
+
+/* ===== theme-white support ===== */
+body.theme-white .conv-topbar,
+body.theme-white .conv-input-area {
+    background: #F5F6FA;
+}
+
+body.theme-white .bubble-text {
+    color: #10161A;
+}
+
+body.theme-white .bubble-time {
+    color: rgba(16, 22, 26, 0.5);
+}
+
+body.theme-white.lg-chat-on .conv-input-bar {
+    background: rgba(255, 255, 255, 0.55);
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* ===================================================
+   LIQUID GLASS IN CHAT — back button + topbar + menu btn
+   بيتفعّل بـ toggle مستقل تمامًا (lg-chat-on) خاص بشاشة الشات
+   بس، ومنفصل تمامًا عن زجاج الرئيسية (lg-bottombar-on)
+=================================================== */
+body.lg-chat-on .conv-back-btn,
+body.lg-chat-on .conv-menu-btn {
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(14px) saturate(1.6) brightness(1.1);
+    -webkit-backdrop-filter: blur(14px) saturate(1.6) brightness(1.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+body.lg-chat-on .conv-topbar {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px) saturate(1.6) brightness(1.08);
+    -webkit-backdrop-filter: blur(20px) saturate(1.6) brightness(1.08);
+    border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+body.theme-white.lg-chat-on .conv-back-btn,
+body.theme-white.lg-chat-on .conv-menu-btn {
+    background: rgba(255, 255, 255, 0.55);
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+body.theme-white.lg-chat-on .conv-topbar {
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(20px) saturate(1.5) brightness(1.03);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5) brightness(1.03);
+    border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+/* ===================================================
+   CUSTOM BUBBLE COLORS — خاص بكل شخص (Firestore)، بيتطبق
+   عن طريق CSS variables بتتحط على .conv-shell من الجافاسكريبت.
+   الافتراضي الرسمي: فقاعتي أخضر واتساب، فقاعة التاني رمادي
+   غامق واتساب (ده الافتراضي في الوضع الداكن). في الوضع الأبيض
+   فيه override تحت بألوان واتساب الفاتحة المقابلة.
+=================================================== */
+.conv-shell {
+    --bubble-mine-bg: #005C4B;
+    --bubble-mine-text: #E9EDEF;
+    --bubble-mine-time: rgba(233, 237, 239, 0.6);
+    --bubble-mine-tick: rgba(233, 237, 239, 0.55);
+    --bubble-theirs-bg: #202C33;
+    --bubble-theirs-text: #E9EDEF;
+    --bubble-theirs-time: rgba(233, 237, 239, 0.6);
+    --bubble-tick-read: #53BDEB;
+}
+
+body.theme-white .conv-shell {
+    --bubble-mine-bg: #DCF8C6;
+    --bubble-mine-text: #111B21;
+    --bubble-mine-time: rgba(17, 27, 33, 0.5);
+    --bubble-mine-tick: rgba(17, 27, 33, 0.45);
+    --bubble-theirs-bg: #E9EAEB;
+    --bubble-theirs-text: #111B21;
+    --bubble-theirs-time: rgba(17, 27, 33, 0.5);
+    --bubble-tick-read: #34B7F1;
+}
+
+.bubble.bubble-right {
+    background: var(--bubble-mine-bg);
+}
+.bubble.bubble-right::after {
+    background: var(--bubble-mine-bg);
+}
+.bubble.bubble-right .bubble-text {
+    color: var(--bubble-mine-text);
+}
+.bubble.bubble-right .bubble-time {
+    color: var(--bubble-mine-time);
+}
+.bubble.bubble-right .bubble-tick.tick-offline,
+.bubble.bubble-right .bubble-tick.tick-unread {
+    background-color: var(--bubble-mine-tick);
+}
+
+.bubble.bubble-left {
+    background: var(--bubble-theirs-bg);
+}
+.bubble.bubble-left::after {
+    background: var(--bubble-theirs-bg);
+}
+.bubble.bubble-left .bubble-text {
+    color: var(--bubble-theirs-text);
+}
+.bubble.bubble-left .bubble-time {
+    color: var(--bubble-theirs-time);
+}
+
+/* ===================================================
+   CUSTOM CHAT FONT — بيتطبق على نص الفقاعات وبار الكتابة
+   بس (مش على واجهة التطبيق كلها)، وبيتحفظ عشان يفضل شغال
+   في كل المحادثات لحد ما يتغيّر تاني
+=================================================== */
+.conv-shell.font-cairo .bubble-text,
+.conv-shell.font-cairo .conv-textarea { font-family: 'Cairo', sans-serif; }
+
+.conv-shell.font-tajawal .bubble-text,
+.conv-shell.font-tajawal .conv-textarea { font-family: 'Tajawal', sans-serif; }
+
+.conv-shell.font-amiri .bubble-text,
+.conv-shell.font-amiri .conv-textarea { font-family: 'Amiri', serif; }
+
+.conv-shell.font-reem .bubble-text,
+.conv-shell.font-reem .conv-textarea { font-family: 'Reem Kufi', sans-serif; }
+
+.conv-shell.font-lobster .bubble-text,
+.conv-shell.font-lobster .conv-textarea { font-family: 'Lobster', cursive; }
+
+.conv-shell.font-pacifico .bubble-text,
+.conv-shell.font-pacifico .conv-textarea { font-family: 'Pacifico', cursive; }
+
+.conv-shell.font-dancing .bubble-text,
+.conv-shell.font-dancing .conv-textarea { font-family: 'Dancing Script', cursive; }
+
+/* معاينات الخطوط جوه شيت اختيار الخط */
+.font-preview-default { font-family: inherit; }
+.font-preview-cairo { font-family: 'Cairo', sans-serif; }
+.font-preview-tajawal { font-family: 'Tajawal', sans-serif; }
+.font-preview-amiri { font-family: 'Amiri', serif; }
+.font-preview-reem { font-family: 'Reem Kufi', sans-serif; }
+.font-preview-lobster { font-family: 'Lobster', cursive; }
+.font-preview-pacifico { font-family: 'Pacifico', cursive; }
+.font-preview-dancing { font-family: 'Dancing Script', cursive; }
+
+/* ===================================================
+   Conversation menu sheets: bubble colors, fonts, info
+=================================================== */
+.bubble-color-section {
+    margin-bottom: 20px;
+}
+
+.bubble-color-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 10px;
+    text-align: start;
+}
+
+.bubble-swatch-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.bubble-swatch-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 6px;
+    border-radius: var(--radius-md);
+    border: 2px solid var(--glass-border);
+    background: var(--glass);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.bubble-swatch-option.selected {
+    border-color: var(--accent);
+    background: rgba(37, 217, 160, 0.08);
+}
+
+.bubble-swatch-option span {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-align: center;
+}
+
+.bubble-swatch-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.bubble-reset-btn {
+    width: 100%;
+    padding: 13px;
+    border-radius: 999px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass);
+    color: var(--text-dim);
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: background 0.2s ease;
+}
+
+.bubble-reset-btn:active {
+    background: var(--glass-strong);
+}
+
+/* ===================================================
+   BUBBLE THEME REDESIGN — معاينة حية + قائمة خيارات +
+   شيت اختيار اللون + مودال المربعات في نص الشاشة
+=================================================== */
+
+/* --- معاينة حية ثابتة فوق الشيت --- */
+.bubble-preview-box {
+    border-radius: var(--radius-md);
+    border: 1px solid var(--glass-border);
+    background: rgba(0, 0, 0, 0.15);
+    padding: 16px 14px 10px;
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.bubble-preview-row {
+    display: flex;
+    width: 100%;
+}
+
+.bubble-preview-row.left {
+    justify-content: flex-start;
+}
+
+.bubble-preview-row.right {
+    justify-content: flex-end;
+}
+
+.bubble.bubble-preview {
+    position: static;
+    max-width: 70%;
+    pointer-events: none;
+}
+
+.bubble.bubble-preview::after {
+    display: none;
+}
+
+.bubble-preview-credit {
+    text-align: center;
+    font-size: 9.5px;
+    font-weight: 600;
+    color: var(--text-dim);
+    opacity: 0.55;
+    letter-spacing: 0.2px;
+    margin-top: 2px;
+}
+
+/* --- قائمة الخيارات التلاتة (يمين / يسار / صح زرقاء) --- */
+.bubble-option-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.bubble-option-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--glass-border);
+    background: var(--glass);
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.bubble-option-row:active {
+    background: var(--glass-strong);
+}
+
+.bubble-option-row span {
+    flex: 1;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text);
+    text-align: start;
+}
+
+.bubble-option-swatch {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    flex-shrink: 0;
+}
+
+.bubble-option-arrow {
+    color: var(--text-dim);
+    flex-shrink: 0;
+    transform: scaleX(-1);
+}
+
+html[dir="ltr"] .bubble-option-arrow {
+    transform: none;
+}
+
+/* --- شيت "اختر لون" الصغير اللي بينزل من تحت --- */
+.sheet-box-small {
+    padding-bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+}
+
+.choose-color-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.choose-color-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--glass-border);
+    background: var(--glass);
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.choose-color-item:active {
+    background: var(--glass-strong);
+}
+
+.choose-color-item span {
+    flex: 1;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text);
+    text-align: start;
+}
+
+.choose-color-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--glass-strong);
+    color: var(--accent);
+    flex-shrink: 0;
+}
+
+.visually-hidden-color-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* --- المودال اللي بيظهر في نص الشاشة (مش من تحت) --- */
+.center-modal-overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.center-modal-box {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+    max-height: 82vh;
+    max-height: 82dvh;
+    overflow-y: auto;
+    background: rgba(21, 26, 32, 0.9);
+    backdrop-filter: blur(28px) saturate(1.7) brightness(1.08);
+    -webkit-backdrop-filter: blur(28px) saturate(1.7) brightness(1.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 22px;
+    padding: 22px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    transform: scale(0.92);
+    opacity: 0;
+    transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.2s ease;
+    text-align: center;
+}
+
+.center-modal-overlay.open .center-modal-box {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.center-modal-box.small {
+    max-width: 320px;
+}
+
+.center-modal-box .sheet-title {
+    margin-bottom: 6px;
+}
+
+.center-modal-box .sheet-sub {
+    margin-bottom: 16px;
+}
+
+/* مربعات الألوان الجاهزة (مش دواير) */
+.preset-square-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 16px 0 20px;
+}
+
+.preset-square-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 6px;
+    border-radius: var(--radius-md);
+    border: 2px solid var(--glass-border);
+    background: var(--glass);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.preset-square-option.selected {
+    border-color: var(--accent);
+    background: rgba(37, 217, 160, 0.08);
+}
+
+.preset-square-option span {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-align: center;
+}
+
+.preset-square {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.color-editor-preview {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.18);
+    margin: 0 auto 14px;
+    background: #FFFFFF;
+}
+
+.center-modal-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.center-modal-actions button {
+    flex: 1;
+    padding: 13px;
+    border-radius: 999px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid var(--glass-border);
+    transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+.color-cancel-btn {
+    background: var(--glass);
+    color: var(--text-dim);
+}
+
+.color-cancel-btn:active {
+    background: var(--glass-strong);
+}
+
+.color-save-btn {
+    background: var(--accent);
+    color: #10161A;
+    border-color: transparent;
+}
+
+.color-save-btn:active {
+    opacity: 0.85;
+}
+
+.font-option-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.font-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    border: 2px solid var(--glass-border);
+    background: var(--glass);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.font-option.selected {
+    border-color: var(--accent);
+    background: rgba(37, 217, 160, 0.08);
+}
+
+.font-option-preview {
+    font-size: 17px;
+    min-width: 44px;
+    text-align: center;
+    color: var(--text);
+}
+
+.font-option-label {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.font-option-label span {
+    font-size: 10.5px;
+    font-weight: 500;
+    color: var(--text-faint);
+}
+
+.font-option-check {
+    position: absolute;
+    left: 14px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.font-option.selected .font-option-check {
+    display: flex;
+}
+
+html[dir="ltr"] .font-option-check,
+html[dir="ltr"] .bubble-color-section-title {
+    left: auto;
+    right: 14px;
+}
+
+/* Account info sheet */
+.account-info-avatar {
+    position: relative;
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: var(--grad, linear-gradient(135deg, #25D9A0, #5B7FFF));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    font-weight: 700;
+    color: #06110C;
+    margin: 0 auto 12px;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.account-info-avatar-icon {
+    width: 55%;
+    height: 55%;
+    color: #06110C;
+}
+
+.account-info-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.account-info-email {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 22px;
+}
+
+.account-info-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 14px 2px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.account-info-row:last-child {
+    border-bottom: none;
+}
+
+.account-info-row-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dim);
+}
+
+.account-info-row-value {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text);
+    text-align: end;
+    word-break: break-all;
+}
+
+/* =====================================================
+   ضغطة مطولة على الرسالة: بلور عالي جدًا للخلفية + الرسالة
+   المحددة تفضل واضحة فوق الطبقة المموهة (spotlight effect)
+   ملحوظة: بنستخدم #ID عشان نضمن إن القيمة دي تكسب أي تعريف
+   تاني موجود لنفس العنصر جوه chatzone-extra.css (اللي
+   بيتحمّل بعد الملف ده)، لأن specificity الـ ID أعلى من أي
+   class selector عادي.
+===================================================== */
+#msgCtxOverlay.open {
+    background: rgba(4, 7, 9, 0.55);
+    backdrop-filter: blur(48px) saturate(1.6);
+    -webkit-backdrop-filter: blur(48px) saturate(1.6);
+}
+
+/* الصف المحدد بيتحط في stacking context جديد بـ z-index عالي
+   جدًا عشان يفضل ظاهر بوضوح فوق طبقة البلور بتاعة #msgCtxOverlay
+   (اللي بتبقى شقيقة لـ .conv-shell في الـ DOM)، بينما باقي
+   الرسايل بتفضل تحتها فمتبانش غير مموهة */
+.msg-row.selected {
+    position: relative;
+    z-index: 9999;
+}
+
+.msg-row.selected .bubble {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* ===== شارة "تم التوجيه" فوق الفقاعة ===== */
+.bubble-forwarded-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11.5px;
+    font-style: italic;
+    margin-bottom: 3px;
+    position: relative;
+    z-index: 1;
+}
+
+.bubble-forwarded-label svg {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+}
+
+.bubble.bubble-right .bubble-forwarded-label {
+    color: var(--bubble-mine-time);
+}
+
+.bubble.bubble-left .bubble-forwarded-label {
+    color: var(--bubble-theirs-time);
+}
+
+/* =====================================================
+   شيت "توجيه إلى" — قايمة الأشخاص اللي كلمتهم قبل كده
+===================================================== */
+.sheet-box-forward {
+    padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+}
+
+.forward-search-input {
+    width: 100%;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 999px;
+    padding: 10px 16px;
+    font-size: 14px;
+    color: var(--text);
+    margin: 14px 0 10px;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.forward-search-input:focus {
+    border-color: var(--glass-border-strong);
+    background: var(--glass-strong);
+}
+
+.forward-search-input::placeholder {
+    color: var(--text-faint);
+}
+
+.forward-contacts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 46vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 6px;
+}
+
+.forward-contact-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 6px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background 0.15s ease, opacity 0.2s ease;
+}
+
+.forward-contact-row:active,
+.forward-contact-row:hover {
+    background: var(--glass-strong);
+}
+
+.forward-contact-row.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.forward-contact-avatar {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-radius: 50%;
+    background: var(--grad);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 700;
+    color: #06110C;
+    flex-shrink: 0;
+}
+
+.forward-contact-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.forward-contact-name {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.forward-contact-email {
+    font-size: 12px;
+    color: var(--text-faint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 1px;
+    direction: ltr;
+    text-align: start;
+}
+
+.forward-contact-check {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--glass-border-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.forward-contact-row.checked .forward-contact-check {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.forward-contact-check svg {
+    width: 12px;
+    height: 12px;
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    stroke: #06110C;
+}
+
+.forward-contact-row.checked .forward-contact-check svg {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.forward-empty,
+.forward-loading {
+    text-align: center;
+    color: var(--text-faint);
+    font-size: 13.5px;
+    padding: 30px 10px;
+}
+
+.forward-send-btn {
+    width: 100%;
+    margin-top: 14px;
+    padding: 13px;
+    border: none;
+    border-radius: 999px;
+    background: var(--grad);
+    color: #06110C;
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.forward-send-btn:active {
+    transform: scale(0.98);
+}
+
+.forward-send-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.forward-send-count {
+    font-size: 13px;
+    font-weight: 700;
+    direction: ltr;
+}
