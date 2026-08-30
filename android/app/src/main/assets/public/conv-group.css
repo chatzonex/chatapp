@@ -1,0 +1,119 @@
+/* ===================================================
+   CONV-GROUP.CSS
+   إضافات بسيطة فوق conversation.css الأصلية عشان الأجزاء الخاصة
+   بالجروب بس (مفيش تكرار لأي حاجة موجودة أصلاً هناك — البابل،
+   البار العلوي، القايمة، الشيتات كلها بترث نفس تصميم conversation.css
+   بالظبط زي ما اتطلب، بما فيه الـ Liquid Glass).
+=================================================== */
+
+/* ===== حرف مبدئي في افتار الجروب (البار العلوي) لو مفيش صورة ===== */
+.group-avatar-initial {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-dim);
+}
+
+.group-avatar-initial-lg {
+    font-size: 30px;
+}
+
+/* ===== شيت "معلومات الجروب": بطاقة أطول شوية عشان تسع قايمة الأعضاء ===== */
+.sheet-box-group-info {
+    max-height: 82vh;
+    max-height: 82dvh;
+    display: flex;
+    flex-direction: column;
+}
+
+#groupInfoMemberCount {
+    margin-bottom: 18px;
+}
+
+.group-members-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.group-member-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 6px;
+    border-radius: 16px;
+}
+
+.group-member-avatar {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border-radius: 50%;
+    background: #16181B;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-dim);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.group-member-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.group-member-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.group-member-name {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.group-member-email {
+    font-size: 12px;
+    color: var(--text-faint);
+    direction: ltr;
+    text-align: start;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.group-member-owner-badge {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--accent, #25D9A0);
+    background: rgba(37, 217, 160, 0.14);
+    border: 1px solid rgba(37, 217, 160, 0.3);
+    border-radius: 999px;
+    padding: 3px 9px;
+    flex-shrink: 0;
+}
+
+/* ===== اسم صاحب كل رسالة فوق الفقاعة (في الجروبات بس، مش شات فردي) ===== */
+.bubble-sender-name {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 3px;
+    color: var(--accent, #25D9A0);
+}
+
+/* ===== شارة النظام (فلان انضم/عمل الجروب) — تستخدم نفس ستايل
+   .msg-row-system-badge الموجود في conversation.css أصلاً =====  */

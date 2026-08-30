@@ -1,0 +1,8 @@
+{
+  "appId": "com.mamods.chatzone",
+  "appName": "ChatZone",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}

@@ -1,0 +1,864 @@
+/* ===================================================
+   SETTINGS SCREEN
+=================================================== */
+
+.settings-page-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 4px 20px 30px;
+}
+
+.settings-card {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius-md);
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    overflow: hidden;
+}
+
+.settings-card-divider {
+    height: 1px;
+    margin: 0 16px;
+    background: var(--glass-border);
+}
+
+.settings-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 15px 16px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.settings-row:hover {
+    background: var(--glass-strong);
+}
+
+.settings-row-icon {
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text);
+}
+
+.settings-row-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.settings-row-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.settings-row-text h4 {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.settings-card-chevron {
+    flex-shrink: 0;
+    color: var(--text-faint);
+    transform: rotate(180deg);
+}
+
+/* ===== Profile row (inside the first settings card) ===== */
+.profile-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.profile-row:hover {
+    background: var(--glass-strong);
+}
+
+.profile-row-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.profile-row-text .profile-name {
+    text-align: start;
+    margin-bottom: 2px;
+}
+
+.profile-row-text .profile-email {
+    text-align: start;
+}
+
+/* ===== Bottom Sheets ===== */
+.sheet-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: rgba(6, 10, 13, 0.6);
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.sheet-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.sheet-box {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-height: 80vh;
+    max-height: 80dvh;
+    overflow-y: auto;
+    background: rgba(21, 26, 32, 0.78);
+    backdrop-filter: blur(28px) saturate(1.7) brightness(1.08);
+    -webkit-backdrop-filter: blur(28px) saturate(1.7) brightness(1.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-bottom: none;
+    border-radius: 26px 26px 0 0;
+    padding: 14px 22px calc(28px + env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.sheet-box::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0) 40%);
+    pointer-events: none;
+}
+
+.sheet-overlay.open .sheet-box {
+    transform: translateY(0);
+}
+
+.sheet-grabber {
+    width: 40px;
+    height: 5px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.25);
+    margin: 0 auto 16px;
+    position: relative;
+    z-index: 1;
+}
+
+.sheet-close {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--glass-strong);
+    border: 1px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text);
+}
+
+.sheet-icon {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 12px;
+    color: var(--text);
+}
+
+/* الأيقونات جوه الشيتات كلها بقت أبيض/أسود بس (بتاخد لون النص
+   الحالي حسب الثيم) عشان تطابق نفس أيقونة الصف اللي فتحتها في
+   صفحة الإعدادات. الاستثناء الوحيد هو أيقونة "تسجيل الخروج" اللي
+   ليها كلاس .sheet-icon-danger وفضلت حمرا زي ما هي، عشان تنبّه
+   المستخدم إنه إجراء خطير. */
+.sheet-icon-danger {
+    color: #F87171;
+}
+
+.sheet-title {
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 6px;
+}
+
+.sheet-sub {
+    font-size: 13px;
+    color: var(--text-dim);
+    text-align: center;
+    line-height: 1.6;
+    margin-bottom: 22px;
+}
+
+/* ===== Liquid Glass toggle rows ===== */
+.lg-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(248, 113, 113, 0.1);
+    border: 1px solid rgba(248, 113, 113, 0.3);
+    color: #fca5a5;
+    font-size: 12px;
+    line-height: 1.6;
+    margin-bottom: 18px;
+}
+
+.lg-toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 2px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.lg-toggle-row:last-child {
+    border-bottom: none;
+}
+
+.lg-toggle-disabled {
+    opacity: 0.45;
+}
+
+.lg-toggle-disabled .ios-switch-track {
+    cursor: not-allowed;
+}
+
+.lg-toggle-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.lg-toggle-text h5 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 2px;
+    color: var(--text);
+}
+
+.lg-toggle-text p {
+    font-size: 11.5px;
+    color: var(--text-dim);
+    line-height: 1.4;
+}
+
+/* iOS-style switch */
+.ios-switch {
+    position: relative;
+    flex-shrink: 0;
+    width: 50px;
+    height: 30px;
+    direction: ltr;
+}
+
+.ios-switch input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.ios-switch-track {
+    display: block;
+    width: 50px;
+    height: 30px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.15);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.25s ease;
+}
+
+.ios-switch-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+    transition: transform 0.3s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+.ios-switch input:checked + .ios-switch-track {
+    background: var(--accent);
+}
+
+.ios-switch input:checked + .ios-switch-track .ios-switch-thumb {
+    transform: translateX(20px);
+}
+
+/* ===== Theme grid ===== */
+.theme-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.theme-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    border: 2px solid var(--glass-border);
+    background: var(--glass);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.theme-option.selected {
+    border-color: var(--accent);
+    background: rgba(37, 217, 160, 0.08);
+}
+
+.theme-swatch {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.theme-option-label {
+    font-size: 13.5px;
+    font-weight: 700;
+}
+
+.theme-option-check {
+    position: absolute;
+    left: 10px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-option.selected .theme-option-check {
+    display: flex;
+}
+
+.theme-color-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    border: 2px solid var(--glass-border);
+    background: var(--glass);
+    cursor: pointer;
+    position: relative;
+}
+
+.theme-color-row.selected {
+    border-color: var(--accent);
+    background: rgba(37, 217, 160, 0.08);
+}
+
+.theme-color-swatch {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    background: conic-gradient(from 0deg, #ef4444, #f97316, #eab308, #22c55e, #06b6d4, #6366f1, #a855f7, #ef4444);
+    position: relative;
+    overflow: hidden;
+}
+
+.theme-color-swatch.has-color::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--picked-color, transparent);
+}
+
+.theme-color-label {
+    flex: 1;
+    font-size: 13.5px;
+    font-weight: 700;
+}
+
+.theme-color-hex {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-weight: 600;
+}
+
+#themeColorPicker {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ===== Language options ===== */
+.lang-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.lang-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    border: 2px solid var(--glass-border);
+    background: var(--glass);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.lang-option.selected {
+    border-color: var(--accent);
+    background: rgba(37, 217, 160, 0.08);
+}
+
+.lang-flag {
+    font-size: 22px;
+    line-height: 1;
+}
+
+.lang-info h4 {
+    font-size: 13.5px;
+    font-weight: 700;
+}
+
+.lang-info p {
+    font-size: 11.5px;
+    color: var(--text-dim);
+}
+
+.lang-check {
+    position: absolute;
+    left: 14px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.lang-option.selected .lang-check {
+    display: flex;
+}
+
+/* ===== Version badge ===== */
+.version-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 6px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    background: rgba(37, 217, 160, 0.12);
+    border: 1px solid rgba(37, 217, 160, 0.3);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+/* ===================================================
+   LIQUID GLASS — extends across the whole app when
+   "Liquid Glass from icons" is enabled in Settings
+=================================================== */
+
+/* Circular icon buttons (3-dots, +) get true frosted glass */
+body.lg-icons-on .icon-btn,
+body.lg-icons-on .add-btn {
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(14px) saturate(1.6) brightness(1.1);
+    -webkit-backdrop-filter: blur(14px) saturate(1.6) brightness(1.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+body.lg-icons-on .add-btn {
+    background: linear-gradient(150deg, rgba(47, 224, 138, 0.85), rgba(37, 211, 102, 0.85) 55%, rgba(26, 168, 85, 0.85));
+    backdrop-filter: blur(14px) saturate(1.7) brightness(1.15);
+    -webkit-backdrop-filter: blur(14px) saturate(1.7) brightness(1.15);
+}
+
+body.lg-icons-on .search-input {
+    background: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(16px) saturate(1.5);
+    -webkit-backdrop-filter: blur(16px) saturate(1.5);
+    border-color: rgba(255, 255, 255, 0.16);
+}
+
+body.lg-icons-on .modal-box {
+    background: rgba(20, 26, 32, 0.65);
+    backdrop-filter: blur(30px) saturate(1.8) brightness(1.1);
+    -webkit-backdrop-filter: blur(30px) saturate(1.8) brightness(1.1);
+    border-color: rgba(255, 255, 255, 0.16);
+}
+
+body.lg-icons-on .modal-box .field-group input {
+    background: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+body.lg-icons-on .modal-btn-secondary {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+body.lg-icons-on .sec-icon,
+body.lg-icons-on .profile-avatar {
+    backdrop-filter: blur(10px) saturate(1.4);
+    -webkit-backdrop-filter: blur(10px) saturate(1.4);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+body.lg-icons-on .sidebar {
+    background: rgba(20, 26, 32, 0.55);
+    backdrop-filter: blur(24px) saturate(1.8) brightness(1.12);
+    -webkit-backdrop-filter: blur(24px) saturate(1.8) brightness(1.12);
+}
+
+body.lg-icons-on .chip,
+body.lg-icons-on .settings-card {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.lg-icons-on * {
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ===== Liquid Glass mode: applied to app chrome when enabled ===== */
+body.lg-bottombar-on .bottom-nav {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(26px) saturate(1.8) brightness(1.15);
+    -webkit-backdrop-filter: blur(26px) saturate(1.8) brightness(1.15);
+    border-color: rgba(255, 255, 255, 0.16);
+}
+
+body.lg-icons-on .icon-btn,
+body.lg-icons-on .add-btn,
+body.lg-icons-on .profile-avatar {
+    backdrop-filter: blur(10px) saturate(1.4);
+    -webkit-backdrop-filter: blur(10px) saturate(1.4);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+/* ===================================================
+   THEME: WHITE — covers every screen, not just Settings
+=================================================== */
+body.theme-white {
+    --bg: #F4F6F5;
+    --bg-elevated: #FFFFFF;
+    --glass: rgba(0, 0, 0, 0.035);
+    --glass-strong: rgba(0, 0, 0, 0.06);
+    --glass-border: rgba(0, 0, 0, 0.09);
+    --glass-border-strong: rgba(0, 0, 0, 0.14);
+    --text: #12181A;
+    --text-dim: #5C6B67;
+    --text-faint: #8B9793;
+}
+
+body.theme-white .app-shell {
+    background:
+        radial-gradient(circle at 15% 5%, rgba(37, 217, 160, 0.08), transparent 40%),
+        radial-gradient(circle at 90% 95%, rgba(91, 127, 255, 0.06), transparent 40%),
+        var(--bg);
+}
+
+/* الشريط بقى Liquid Glass حقيقي دايمًا (مش مرتبط بـ lg-bottombar-on)،
+   فبقى لازم نفس المعاملة دي تتطبق على الوضع الأبيض هنا بشكل ثابت،
+   مش بس لما الإعداد يبقى مفعّل. */
+body.theme-white .bottom-nav {
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(40px) saturate(2) brightness(1.05);
+    -webkit-backdrop-filter: blur(40px) saturate(2) brightness(1.05);
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+body.theme-white .nav-btn:not(.active) {
+    color: var(--text-dim);
+}
+
+/* الأيقونة النشطة كانت بتتحول أبيض وتختفي على خلفية فاتحة — دلوقتي
+   بتاخد نفس لون النص الغامق زي باقي الأيقونات في الوضع الأبيض. */
+body.theme-white .nav-btn.active {
+    color: var(--text);
+}
+
+/* نفس الزجاج الحقيقي بتاع الشريط السفلي، لكن بألوان فاتحة تناسب
+   الوضع الأبيض — بار "الإعدادات" بقى بلور حقيقي هنا كمان. */
+body.theme-white .topbar-simple {
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(40px) saturate(2) brightness(1.05);
+    -webkit-backdrop-filter: blur(40px) saturate(2) brightness(1.05);
+    border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+body.theme-white .search-input,
+body.theme-white .modal-box .field-group input {
+    color: var(--text);
+}
+
+body.theme-white .modal-box {
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+}
+
+body.theme-white.lg-icons-on .modal-box {
+    background: rgba(255, 255, 255, 0.68);
+    backdrop-filter: blur(30px) saturate(1.6) brightness(1.05);
+    -webkit-backdrop-filter: blur(30px) saturate(1.6) brightness(1.05);
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+body.theme-white .sheet-box {
+    background: rgba(248, 249, 250, 0.85);
+    backdrop-filter: blur(28px) saturate(1.5) brightness(1.02);
+    -webkit-backdrop-filter: blur(28px) saturate(1.5) brightness(1.02);
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+body.theme-white .sheet-box::before {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 40%);
+}
+
+body.theme-white .sheet-close {
+    color: var(--text);
+}
+
+body.theme-white .modal-btn-primary,
+body.theme-white .add-btn {
+    color: #FFFFFF;
+}
+
+body.theme-white .profile-avatar {
+    background: #E4E6E8;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+body.theme-white .profile-avatar-icon { color: #9BA0A6; }
+
+body.theme-white .sidebar {
+    background: rgba(255, 255, 255, 0.88);
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+body.theme-white .sidebar-item:active,
+body.theme-white .sidebar-item:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+/* ===================================================
+   THEME: CUSTOM COLOR — --accent is set inline via JS,
+   this just keeps the same "selected" visuals in sync
+=================================================== */
+body.theme-custom .add-btn,
+body.theme-custom .modal-btn-primary {
+    background: var(--grad);
+}
+
+body.theme-custom .search-input:focus,
+body.theme-custom .modal-box .field-group input:focus {
+    border-color: var(--accent);
+}
+
+/* ===================================================
+   LOGOUT ROW (danger styling for the settings list)
+=================================================== */
+.settings-row-danger .settings-row-text h4 {
+    color: #F87171;
+}
+
+.settings-row-icon-danger {
+    color: #F87171;
+}
+
+.logout-status {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-dim);
+    margin: -8px 0 14px;
+}
+
+/* ===================================================
+   ADD-CHAT CHOICE MODAL (اكونت قديم / شخص جديد)
+   ثابت Liquid Glass دايمًا (مش مرتبط بإعداد "Liquid Glass من
+   الأيقونات")، بتدرّج نحو الأسود، وحواف ناعمة جداً على كل حاجة
+   جواه: الكارت نفسه، عناصر الاختيار، حقل الإيميل، الأزرار.
+=================================================== */
+.add-choice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.add-choice-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 14px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(18px) saturate(1.6) brightness(1.06);
+    -webkit-backdrop-filter: blur(18px) saturate(1.6) brightness(1.06);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.10);
+    cursor: pointer;
+    text-align: start;
+    font-family: inherit;
+    color: var(--text);
+    transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.add-choice-item:active {
+    transform: scale(0.98);
+}
+
+.add-choice-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.add-choice-icon {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    color: var(--accent, #25D9A0);
+}
+
+.add-choice-icon svg {
+    width: 19px;
+    height: 19px;
+}
+
+.add-choice-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.add-choice-text h4 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.add-choice-text p {
+    font-size: 12px;
+    color: var(--text-dim);
+}
+
+.add-choice-item .settings-card-chevron {
+    flex-shrink: 0;
+}
+
+/* ===================================================
+   PREVIOUS CONTACTS LIST
+=================================================== */
+.contacts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 320px;
+    overflow-y: auto;
+    margin-bottom: 16px;
+}
+
+.contact-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 10px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.contact-row:hover,
+.contact-row:active {
+    background: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.contact-row-avatar {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--grad);
+    color: #06110C;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.contact-row-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.contact-row-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.contacts-empty {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-dim);
+    padding: 20px 0;
+    margin-bottom: 16px;
+}
