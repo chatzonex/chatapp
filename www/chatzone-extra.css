@@ -133,6 +133,26 @@ body.theme-white .bubble.bubble-ai::after {
     color: #F87171;
 }
 
+/* ===== theme-white support for long-press context menu ===== */
+body.theme-white .ctx-menu {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+body.theme-white .ctx-menu-item {
+    color: var(--text);
+}
+
+body.theme-white .ctx-menu-item:active,
+body.theme-white .ctx-menu-item:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+body.theme-white .ctx-menu-item.danger {
+    color: #DC2626;
+}
+
 /* ===== Confirm sheet (delete chat / delete message) =====
    نفس بار الـ .sheet-box بتاع باقي الأبب، بس أصغر ومخصص
    لتأكيد إجراء بس (مش قايمة اختيارات طويلة) */

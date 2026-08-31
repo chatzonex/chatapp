@@ -10,6 +10,44 @@
         window.location.replace('index.html');
     }
 </script>
+<script>
+    // تطبيق فوري لإعدادات "الزجاج السائل" (bottombar/icons/chat) قبل
+    // ما أي CSS يترسم — بيمنع تمامًا أي "قفشة" أو انتقال مرئي بين
+    // الشكل الافتراضي وشكل الزجاج وقت فتح الصفحة.
+    // بما إن <body> لسه مش موجود دلوقتي، بنحط الكلاسات على <html>
+    // فورًا، وأول ما <body> يتاح (أول tick ممكن، قبل حتى أول رسم
+    // فعلي للمتصفح) بننقلها له عشان كل قواعد الـ CSS الحالية
+    // (body.lg-bottombar-on...) تفضل شغالة زي ما هي من غير أي تعديل.
+    (function () {
+        try {
+            var flags = {
+                bottombar: localStorage.getItem('cz_lg_bottombar') === 'on',
+                icons: localStorage.getItem('cz_lg_icons') === 'on',
+                chat: localStorage.getItem('cz_lg_chat') === 'on'
+            };
+            var html = document.documentElement;
+            if (flags.bottombar) html.classList.add('lg-bottombar-on');
+            if (flags.icons) html.classList.add('lg-icons-on');
+            if (flags.chat) html.classList.add('lg-chat-on');
+
+            var moveToBody = function () {
+                if (!document.body) return;
+                if (flags.bottombar) document.body.classList.add('lg-bottombar-on');
+                if (flags.icons) document.body.classList.add('lg-icons-on');
+                if (flags.chat) document.body.classList.add('lg-chat-on');
+            };
+            // MutationObserver بيلقط أول لحظة يظهر فيها <body> في الـ
+            // DOM (حتى قبل ما محتواه يخلص تحميل)، فمفيش أي تأخير محسوس
+            if (document.body) {
+                moveToBody();
+            } else {
+                new MutationObserver(function (_, obs) {
+                    if (document.body) { moveToBody(); obs.disconnect(); }
+                }).observe(document.documentElement, { childList: true });
+            }
+        } catch (e) {}
+    })();
+</script>
 <link rel="stylesheet" href="main.css">
 <link rel="stylesheet" href="settings.css">
 <link rel="stylesheet" href="chatzone-extra.css">

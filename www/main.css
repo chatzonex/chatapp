@@ -945,6 +945,60 @@ html[dir="ltr"] .sidebar {
 }
 
 /* ===================================================
+   نسخة الوضع الأبيض من نفس المودالات فوق — بديل فاتح
+   متناسق مع باقي الواجهة بدل التدرج الأسود الثابت
+=================================================== */
+body.theme-white #addChoiceOverlay,
+body.theme-white #contactsOverlay,
+body.theme-white #newChatOverlay {
+    background: rgba(0, 0, 0, 0.28);
+}
+
+body.theme-white #addChoiceOverlay .modal-box,
+body.theme-white #contactsOverlay .modal-box,
+body.theme-white #newChatOverlay .modal-box {
+    background:
+        radial-gradient(120% 140% at 50% -10%, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 45%),
+        linear-gradient(165deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 249, 250, 0.98) 55%, rgba(244, 246, 245, 1) 100%);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.16),
+        0 2px 0 rgba(255, 255, 255, 0.8) inset,
+        0 -1px 0 rgba(0, 0, 0, 0.04) inset;
+}
+
+body.theme-white #addChoiceOverlay .modal-box::before,
+body.theme-white #contactsOverlay .modal-box::before,
+body.theme-white #newChatOverlay .modal-box::before {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0) 30%);
+}
+
+body.theme-white #addChoiceOverlay .modal-btn-secondary,
+body.theme-white #contactsOverlay .modal-btn-secondary,
+body.theme-white #newChatOverlay .modal-btn-secondary {
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    color: var(--text);
+}
+
+body.theme-white #addChoiceOverlay .modal-box .field-group input,
+body.theme-white #contactsOverlay .modal-box .field-group input,
+body.theme-white #newChatOverlay .modal-box .field-group input {
+    background: rgba(0, 0, 0, 0.035);
+    border: 1px solid rgba(0, 0, 0, 0.09);
+    color: var(--text);
+}
+
+body.theme-white #addChoiceOverlay h3,
+body.theme-white #contactsOverlay h3,
+body.theme-white #newChatOverlay h3,
+body.theme-white #addChoiceOverlay p,
+body.theme-white #contactsOverlay p,
+body.theme-white #newChatOverlay p {
+    color: var(--text);
+}
+
+/* ===================================================
    LIQUID GLASS — مودالات إنشاء الجروب (اختيار أعضاء / اسم وصورة)
    نفس المعاملة بالظبط بتاعة مودالات الـ"+"، بتدرّج نحو الأسود
 =================================================== */
@@ -1179,31 +1233,49 @@ html[dir="rtl"] .group-photo-picker-badge {
     -webkit-backdrop-filter: blur(12px);
 }
 
-/* ===== Floating Bottom Nav — calm dark slate base + real iOS 26 Liquid Glass ===== */
+/* ===== Floating/Docked Bottom Nav =====
+   الوضع الافتراضي: بار واصل لآخر الشاشة تمامًا، لاصق في الأرض، بس
+   بردو فيه بلور خفيف بيغرشن اللي وراه (مش لون solid جامد بالكامل).
+   لما "الزجاج السائل" يتفعّل من الإعدادات (lg-bottombar-on)، البلور
+   بيزيد بقوة أكبر بكتير وشفافية أعلى — لكن يفضل بنفس العرض الكامل
+   للشاشة (edge-to-edge) زي الوضع العادي بالظبط، من غير ما يصغر أو
+   يبقى عايم بمسافات من الجنبين. */
 .bottom-nav {
     position: fixed;
-    bottom: max(22px, calc(env(safe-area-inset-bottom) + 14px));
-    left: 14px;
-    right: 14px;
-    max-width: 420px;
-    margin: 0 auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-width: none;
+    margin: 0;
     display: flex;
     align-items: center;
     justify-content: space-around;
     gap: 4px;
     padding: 7px;
+    padding-bottom: max(7px, env(safe-area-inset-bottom));
     height: 62px;
-    /* Bottom nav is ALWAYS 100% real Liquid Glass — true backdrop blur
-       of everything behind it, no dark solid tint, pure translucent
-       white glass. Independent of the lg-bottombar-on setting toggle. */
+    height: calc(62px + env(safe-area-inset-bottom));
+    background: var(--bg-elevated-translucent, rgba(16, 22, 28, 0.55));
+    backdrop-filter: blur(45px) saturate(1.8) brightness(1.1);
+    -webkit-backdrop-filter: blur(45px) saturate(1.8) brightness(1.1);
+    border: none;
+    border-top: 1px solid var(--glass-border);
+    border-radius: 0;
+    box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.25);
+    z-index: 100;
+    isolation: isolate;
+    transition: background 0.3s ease, backdrop-filter 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ===== وضع الزجاج السائل (لما المستخدم يفعّله من الإعدادات) =====
+   نفس الموضع والعرض الكامل بالظبط، بس بلور أقوى وأكتر شفافية */
+body.lg-bottombar-on .bottom-nav,
+html.lg-bottombar-on .bottom-nav {
     background: rgba(255, 255, 255, 0.10);
     backdrop-filter: blur(40px) saturate(2) brightness(1.25);
     -webkit-backdrop-filter: blur(40px) saturate(2) brightness(1.25);
-    border: 1px solid rgba(255, 255, 255, 0.28);
-    border-radius: 999px;
-    box-shadow: 0 16px 46px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 -1px 0 rgba(255, 255, 255, 0.08);
-    z-index: 100;
-    isolation: isolate;
+    border-top: 1px solid rgba(255, 255, 255, 0.28);
+    box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .bottom-nav::before {
@@ -1211,9 +1283,16 @@ html[dir="rtl"] .group-photo-picker-badge {
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 50%);
+    background: transparent;
     pointer-events: none;
     z-index: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease, background 0.3s ease;
+}
+
+body.lg-bottombar-on .bottom-nav::before,
+html.lg-bottombar-on .bottom-nav::before {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 50%);
     opacity: 1;
 }
 

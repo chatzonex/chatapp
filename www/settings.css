@@ -561,13 +561,10 @@ body.lg-icons-on .settings-card {
     }
 }
 
-/* ===== Liquid Glass mode: applied to app chrome when enabled ===== */
-body.lg-bottombar-on .bottom-nav {
-    background: rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(26px) saturate(1.8) brightness(1.15);
-    -webkit-backdrop-filter: blur(26px) saturate(1.8) brightness(1.15);
-    border-color: rgba(255, 255, 255, 0.16);
-}
+/* ===== Liquid Glass mode: applied to app chrome when enabled =====
+   شكل شريط التنقل نفسه (عادي solid vs زجاجي عايم) بقى متحكم فيه
+   بالكامل من main.css (.bottom-nav + body.lg-bottombar-on .bottom-nav)
+   عشان الانتقال بين الوضعين يبقى سلس بترانزيشن واحد موحّد. */
 
 body.lg-icons-on .icon-btn,
 body.lg-icons-on .add-btn,
@@ -599,10 +596,15 @@ body.theme-white .app-shell {
         var(--bg);
 }
 
-/* الشريط بقى Liquid Glass حقيقي دايمًا (مش مرتبط بـ lg-bottombar-on)،
-   فبقى لازم نفس المعاملة دي تتطبق على الوضع الأبيض هنا بشكل ثابت،
-   مش بس لما الإعداد يبقى مفعّل. */
+/* في الوضع الأبيض العادي (من غير الزجاج السائل)، الشريط بيفضل solid
+   عادي بس بلون فاتح مناسب للثيم بدل الأسود. الزجاج الحقيقي بيظهر
+   بس لو "الزجاج السائل" مفعّل من الإعدادات (lg-bottombar-on). */
 body.theme-white .bottom-nav {
+    background: var(--bg-elevated);
+    border-top-color: var(--glass-border);
+}
+
+body.theme-white.lg-bottombar-on .bottom-nav {
     background: rgba(255, 255, 255, 0.45);
     backdrop-filter: blur(40px) saturate(2) brightness(1.05);
     -webkit-backdrop-filter: blur(40px) saturate(2) brightness(1.05);
