@@ -1,7 +1,3 @@
-/* ===================================================
-   ChatZone Ai — Chat Page Styles
-=================================================== */
-
 .ai-topbar-avatar {
     background: #0B0F12;
     box-shadow: 0 0 0 2px rgba(37, 217, 160, 0.35);
@@ -15,10 +11,6 @@
     filter: drop-shadow(0 0 4px rgba(37, 217, 160, 0.4));
 }
 
-/* ===================================================
-   شاشة الترحيب — لوجو ثابت في نص الشاشة، من غير أي نبض أو
-   حلقات متوهجة، بيدور بس ببطء شديد زي الـ spinner
-=================================================== */
 .ai-welcome {
     margin: auto;
     display: flex;
@@ -79,11 +71,6 @@
     color: var(--text-dim);
 }
 
-/* ===================================================
-   فقاعات رسائل الـ AI — بتاخد لونها من متغيّر --ai-bubble-bg
-   (لو المستخدم غيّره من "تخصيص لون الفقاعات")، وبترجع للون
-   الداكن الافتراضي لو محدش غيّر حاجة
-=================================================== */
 .bubble.bubble-ai {
     background: var(--ai-bubble-bg, #1B2027);
     border: 1px solid rgba(37, 217, 160, 0.18);
@@ -97,8 +84,6 @@
     color: var(--ai-bubble-time, rgba(233, 237, 239, 0.5));
 }
 
-/* ذيل الفقاعة بياخد نفس اللون بالظبط عن طريق --ai-bubble-bg،
-   عشان يندمج مع الفقاعة بدل ما يبان بلون مختلف */
 .bubble.bubble-ai::after {
     background: var(--ai-bubble-bg, #1B2027) !important;
 }
@@ -112,7 +97,52 @@ body.theme-white .bubble.bubble-ai .bubble-text {
     color: var(--ai-bubble-text, #10161A);
 }
 
-/* ===== مؤشر "بيكتب..." أثناء انتظار رد الـ AI ===== */
+.bubble-inline-link {
+    color: #4EA1FF;
+    text-decoration: underline;
+    word-break: break-all;
+}
+
+.bubble-inline-link:hover {
+    text-decoration: none;
+}
+
+.bubble-sources {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(78, 161, 255, 0.25);
+}
+
+.bubble-source-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #4EA1FF;
+    text-decoration: none;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.bubble-source-link::before {
+    content: "🔗";
+    font-size: 11px;
+    flex-shrink: 0;
+}
+
+.bubble-source-link:hover {
+    text-decoration: underline;
+}
+
+body.theme-white .bubble-sources {
+    border-top: 1px solid rgba(78, 161, 255, 0.3);
+}
+
 .ai-typing-bubble {
     display: flex;
     align-items: center;
@@ -136,7 +166,6 @@ body.theme-white .bubble.bubble-ai .bubble-text {
     30%           { transform: translateY(-4px); opacity: 1; }
 }
 
-/* ===== رسالة خطأ بسيطة لو الاتصال فشل ===== */
 .ai-error-badge {
     align-self: center;
     max-width: 82%;
@@ -150,7 +179,6 @@ body.theme-white .bubble.bubble-ai .bubble-text {
     margin: 10px 0;
 }
 
-/* ===== توست صغير (نسخ/حذف...) — نفس شكل الشات العادي ===== */
 .cz-toast {
     position: fixed;
     left: 50%;
@@ -178,4 +206,3 @@ body.theme-white .cz-toast {
     color: #10161A;
     border: 1px solid rgba(0, 0, 0, 0.08);
 }
-

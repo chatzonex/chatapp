@@ -1381,10 +1381,6 @@ async function saveContact(myEmail, otherEmail) {
 
         bubble.appendChild(meta);
         inner.appendChild(bubble);
-
-        // ===== شريط الريأكشنز (لو فيه أي إيموجي متحط على الرسالة دي) =====
-        renderMessageReactions(bubble, docId, msg.reactions, isMine);
-
         row.appendChild(inner);
         messagesEl.appendChild(row);
 
@@ -1735,119 +1731,6 @@ async function saveContact(myEmail, otherEmail) {
         if (msgCtxMenu) msgCtxMenu.classList.remove('open');
         if (msgCtxOverlay) msgCtxOverlay.classList.remove('open');
         document.querySelectorAll('.msg-row.selected').forEach(r => r.classList.remove('selected'));
-    }
-
-    // ===================================================
-    // ===== نظام الريأكشنز (إيموجي فوق الرسالة) =====
-    // بنخزن في Firestore جوه كل مستند رسالة field اسمها reactions،
-    // شكلها object: { "👍": ["uid1", "uid2"], "❤": ["uid3"] }.
-    // أي تغيير بيتزامن تلقائيًا للطرفين عن طريق نفس onSnapshot
-    // الموجود أصلاً للرسايل، فمفيش حاجة إضافية مطلوبة للمزامنة.
-    // ===================================================
-
-    function renderMessageReactions(bubble, docId, reactions, isMine) {
-        // بنشيل أي شريط ريأكشنز قديم قبل ما نعيد الرسم (لو الرسالة
-        // دي بتتحدث بسبب ريأكشن جديد من الطرف التاني مثلاً)
-        const old = bubble.querySelector('.bubble-reactions');
-        if (old) old.remove();
-
-        if (!reactions || typeof reactions !== 'object') return;
-        const entries = Object.entries(reactions).filter(([, uids]) => Array.isArray(uids) && uids.length > 0);
-        if (!entries.length) return;
-
-        const bar = document.createElement('div');
-        bar.className = 'bubble-reactions';
-
-        entries.forEach(([emoji, uids]) => {
-            const mine = myUid && uids.includes(myUid);
-            const pill = document.createElement('div');
-            pill.className = 'bubble-reaction-pill' + (mine ? ' mine' : '');
-            pill.innerHTML = `<span>${emoji}</span>` + (uids.length > 1 ? `<span class="count">${uids.length}</span>` : '');
-            // دوس على أي ريأكشن موجود = تشيله لو أنت اللي حاطه، أو
-            // تضيف نفسك عليه لو حاطط ريأكشن تاني قبل كده (زي واتساب:
-            // بتقدر تحط ريأكشن واحد بس لكل رسالة من ناحيتك أنت)
-            pill.addEventListener('click', () => toggleReaction(docId, emoji));
-            bar.appendChild(pill);
-        });
-
-        bubble.appendChild(bar);
-    }
-
-    async function toggleReaction(docId, emoji) {
-        if (!myUid || !docId) return;
-        const msg = messagesById.get(docId);
-        if (!msg) return;
-
-        const reactions = msg.reactions || {};
-        const alreadyOnThis = Array.isArray(reactions[emoji]) && reactions[emoji].includes(myUid);
-
-        try {
-            const msgRef = doc(db, 'chats', chatId, 'messages', docId);
-            const updates = {};
-
-            // بنمنع الشخص إنه يحط أكتر من ريأكشن واحد على نفس الرسالة
-            // في نفس الوقت — أي إيموجي تاني حاططه بنشيله الأول
-            Object.keys(reactions).forEach((existingEmoji) => {
-                if (existingEmoji !== emoji && Array.isArray(reactions[existingEmoji]) && reactions[existingEmoji].includes(myUid)) {
-                    updates[`reactions.${existingEmoji}`] = arrayRemove(myUid);
-                }
-            });
-
-            updates[`reactions.${emoji}`] = alreadyOnThis ? arrayRemove(myUid) : arrayUnion(myUid);
-
-            await updateDoc(msgRef, updates);
-            if (navigator.vibrate) { try { navigator.vibrate(8); } catch (e) {} }
-        } catch (e) {
-            console.error('فشل تحديث الريأكشن:', e);
-        }
-    }
-
-    // ===== شريط الإيموجي السريع فوق قايمة رد/نسخ/حذف =====
-    const ctxEmojiBar = document.getElementById('ctxEmojiBar');
-    const ctxEmojiMoreBtn = document.getElementById('ctxEmojiMoreBtn');
-    const ctxEmojiMoreInput = document.getElementById('ctxEmojiMoreInput');
-
-    if (ctxEmojiBar) {
-        ctxEmojiBar.querySelectorAll('.ctx-emoji-btn[data-emoji]').forEach((btn) => {
-            btn.addEventListener('click', () => {
-                const emoji = btn.getAttribute('data-emoji');
-                if (ctxMsgId) toggleReaction(ctxMsgId, emoji);
-                closeMsgCtxMenu();
-            });
-        });
-    }
-
-    // زرار "+": بيفتح كيبورد الجهاز على وضع الإيموجي (لو الكيبورد
-    // بيدعم كده)، وبمجرد ما المستخدم يختار إيموجي من كيبورده، بنلقطه
-    // من قيمة الـ input ونحطه كريأكشن زي أي إيموجي تاني من الشريط
-    if (ctxEmojiMoreBtn && ctxEmojiMoreInput) {
-        ctxEmojiMoreBtn.addEventListener('click', () => {
-            ctxEmojiMoreInput.removeAttribute('readonly');
-            ctxEmojiMoreInput.value = '';
-            ctxEmojiMoreInput.focus();
-        });
-
-        ctxEmojiMoreInput.addEventListener('input', () => {
-            const val = ctxEmojiMoreInput.value.trim();
-            if (!val) return;
-            // بناخد أول "حرف" فعلي (إيموجي ممكن يتكون من أكتر من
-            // code point واحد، فبنستخدم Intl.Segmenter لو متاحة،
-            // وإلا بناخد القيمة كلها كإيموجي واحد كحل بديل بسيط)
-            let emoji = val;
-            try {
-                if (typeof Intl !== 'undefined' && Intl.Segmenter) {
-                    const seg = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
-                    const first = seg.segment(val)[Symbol.iterator]().next();
-                    if (first && !first.done) emoji = first.value.segment;
-                }
-            } catch (e) {}
-
-            if (ctxMsgId) toggleReaction(ctxMsgId, emoji);
-            ctxEmojiMoreInput.value = '';
-            ctxEmojiMoreInput.setAttribute('readonly', 'readonly');
-            ctxEmojiMoreInput.blur();
-            closeMsgCtxMenu();
-        });
     }
 
     if (msgCtxOverlay) msgCtxOverlay.addEventListener('click', closeMsgCtxMenu);

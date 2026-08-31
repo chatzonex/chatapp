@@ -1,20 +1,9 @@
-// =====================================================
-// ChatZone Ai — منطق صفحة شات الذكاء الاصطناعي
-// بيتكلم مع Cloudflare Worker (اللي بيخبي مفتاح Groq API)
-// بدل ما يتكلم مع Firestore زي شات الأشخاص العادي.
-// كل حاجة (رسايل، ألوان الفقاعات) متخزنة محليًا بس (localStorage).
-// =====================================================
-
-// ⚠️ غيّر الرابط ده لو غيّرت اسم الـ Worker بتاعك على Cloudflare
 const AI_WORKER_URL = "https://chatzone-ai.m7ashr213.workers.dev/";
 
-// اسم الموديل المستخدم (لازم يتطابق مع اللي مكتوب في كود الـ Worker)
 const AI_MODEL = "openai/gpt-oss-120b";
 
 (function () {
-    // =====================================================
-    // 1) احترام الثيم واللغة والـ Liquid Glass المحفوظين، زي باقي الشاشات
-    // =====================================================
+
     const lang = localStorage.getItem('cz_lang') || 'ar';
     const theme = localStorage.getItem('cz_theme') || 'dark';
     const isAr = lang === 'ar';
@@ -33,9 +22,6 @@ const AI_MODEL = "openai/gpt-oss-120b";
         document.body.classList.add('lg-chat-on');
     }
 
-    // =====================================================
-    // 2) ترجمة واجهة الصفحة بالكامل (تبع لغة التطبيق المحفوظة)
-    // =====================================================
     const I18N = {
         ar: {
             status_online: 'متصل الآن',
@@ -81,9 +67,9 @@ const AI_MODEL = "openai/gpt-oss-120b";
             copied_toast: 'اتنسخت الرسالة',
             deleted_toast: 'اتحذفت الرسالة',
             placeholder: 'اكتب رسالة...',
-            error_connection: 'حصلت مشكلة في الاتصال بالذكاء الاصطناعي، حاول تاني.',
-            error_network: 'في مشكلة في الاتصال بالإنترنت، جرب تاني.',
-            error_fallback: 'معرفتش أرد دلوقتي، حاول تسأل بطريقة تانية.',
+            error_connection: 'حصلت مشكلة في الاتصال بالذكاء الاصطناعي، حاول تاني. لو المشكلة استمرت كلّم الدعم على 01019569018.',
+            error_network: 'في مشكلة في الاتصال بالإنترنت، جرب تاني. لو المشكلة استمرت كلّم الدعم على 01019569018.',
+            error_fallback: 'معرفتش أرد دلوقتي، حاول تسأل بطريقة تانية. لو المشكلة استمرت كلّم الدعم على 01019569018.',
             default: 'افتراضي', dark: 'داكن', silver: 'فضي', green: 'أخضر',
             blue: 'أزرق', pink: 'وردي', purple: 'بنفسجي', orange: 'برتقالي',
             cyan: 'سماوي', red: 'أحمر'
@@ -132,9 +118,9 @@ const AI_MODEL = "openai/gpt-oss-120b";
             copied_toast: 'Message copied',
             deleted_toast: 'Message deleted',
             placeholder: 'Type a message...',
-            error_connection: 'There was a problem reaching the AI, please try again.',
-            error_network: 'There\'s a connection problem, please try again.',
-            error_fallback: "I couldn't answer that, try asking differently.",
+            error_connection: 'There was a problem reaching the AI, please try again. If it keeps happening, contact support at 01019569018.',
+            error_network: 'There\'s a connection problem, please try again. If it keeps happening, contact support at 01019569018.',
+            error_fallback: "I couldn't answer that, try asking differently. If it keeps happening, contact support at 01019569018.",
             default: 'Default', dark: 'Dark', silver: 'Silver', green: 'Green',
             blue: 'Blue', pink: 'Pink', purple: 'Purple', orange: 'Orange',
             cyan: 'Cyan', red: 'Red'
@@ -205,7 +191,6 @@ const AI_MODEL = "openai/gpt-oss-120b";
     }
     applyStaticTranslations();
 
-    // ===== عناصر الصفحة =====
     const convMessages = document.getElementById('convMessages');
     const aiWelcome = document.getElementById('aiWelcome');
     const aiTextarea = document.getElementById('aiTextarea');
@@ -229,7 +214,6 @@ const AI_MODEL = "openai/gpt-oss-120b";
     const convSelectCount = document.getElementById('convSelectCount');
     const convSelectDeleteBtn = document.getElementById('convSelectDeleteBtn');
 
-    // ===== تخزين محلي لتاريخ المحادثة (بيتفتح تاني لو رجعت للصفحة) =====
     const STORAGE_KEY = 'cz_ai_chat_history';
 
     function loadHistory() {
@@ -244,29 +228,24 @@ const AI_MODEL = "openai/gpt-oss-120b";
     function saveHistory(history) {
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-        } catch (e) { /* تجاهل لو الملف كبير أوي */ }
+        } catch (e) {  }
     }
 
-    // كل رسالة: { id, role: 'user'|'assistant', content, ts, replyTo?: {id, text, senderName}, deleted?: bool }
     let history = loadHistory();
     let msgIdCounter = Date.now();
     function nextMsgId() {
         msgIdCounter += 1;
         return 'm' + msgIdCounter;
     }
-    // بنضمن إن كل رسالة قديمة معاها id (لو كانت متخزنة بنسخة قديمة من غير id)
+
     history.forEach((m) => { if (!m.id) m.id = nextMsgId(); });
 
-    // ===== رجوع =====
     if (convBackBtn) {
         convBackBtn.addEventListener('click', () => {
             window.location.href = 'MainActivity.html';
         });
     }
 
-    // =====================================================
-    // قايمة التلت نقط (نفس منطق conversation.js بالظبط)
-    // =====================================================
     function openConvMenu() {
         if (!convSidebarMenu || !convSidebarOverlay || !convMenuBtn) return;
         const isRtl = document.documentElement.dir === 'rtl';
@@ -323,7 +302,6 @@ const AI_MODEL = "openai/gpt-oss-120b";
         });
     }
 
-    // ===== توست صغير =====
     let toastTimer = null;
     function showToast(message) {
         let toastEl = document.getElementById('czToast');
@@ -339,10 +317,6 @@ const AI_MODEL = "openai/gpt-oss-120b";
         toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2200);
     }
 
-    // =====================================================
-    // تخصيص لون الفقاعات — خاص بشات الـ AI بس، متخزن محليًا
-    // (نفس آلية conversation.js: بيغيّر CSS variables على الشِل)
-    // =====================================================
     const BUBBLE_MINE_KEY = 'cz_ai_bubble_mine';
     const BUBBLE_MINE_DARK_KEY = 'cz_ai_bubble_mine_dark';
     const BUBBLE_THEIRS_KEY = 'cz_ai_bubble_theirs';
@@ -439,7 +413,7 @@ const AI_MODEL = "openai/gpt-oss-120b";
     const presetsSaveBtn = document.getElementById('presetsSaveBtn');
     const presetsCancelBtn = document.getElementById('presetsCancelBtn');
 
-    let activeColorTarget = null; // 'mine' | 'theirs'
+    let activeColorTarget = null;
     let pendingEditorColor = null;
     let pendingEditorIsDark = '1';
     let pendingPresetChoice = null;
@@ -549,7 +523,6 @@ const AI_MODEL = "openai/gpt-oss-120b";
     applyBubbleColors();
     refreshBubblePreview();
 
-    // ===== إظهار/إخفاء شاشة الترحيب باللوجو =====
     function showWelcome() {
         aiWelcome.classList.remove('ai-welcome-hidden');
     }
@@ -557,7 +530,6 @@ const AI_MODEL = "openai/gpt-oss-120b";
         aiWelcome.classList.add('ai-welcome-hidden');
     }
 
-    // ===== رسم فقاعة رسالة (مستخدم أو AI)، بنفس بنية conversation.js =====
     function formatTime(date) {
         let h = date.getHours();
         const m = date.getMinutes().toString().padStart(2, '0');
@@ -575,7 +547,7 @@ const AI_MODEL = "openai/gpt-oss-120b";
     const LONG_PRESS_MSG_MS = 420;
     let selectModeOn = false;
     let selectedMessages = new Map();
-    let activeReply = null; // { id, text, senderName, isMine }
+    let activeReply = null;
 
     function messagePreviewText(msg) {
         if (msg.deleted) return T.deleted_msg_text;
@@ -597,6 +569,26 @@ const AI_MODEL = "openai/gpt-oss-120b";
 
     function findMsg(id) {
         return history.find(m => m.id === id);
+    }
+
+    const URL_REGEX = /(https?:\/\/[^\s<>"']+)/g;
+    function renderTextWithLinks(container, text) {
+        container.textContent = '';
+        const parts = String(text || '').split(URL_REGEX);
+        parts.forEach((part) => {
+            if (!part) return;
+            if (/^https?:\/\//.test(part)) {
+                const a = document.createElement('a');
+                a.className = 'bubble-inline-link';
+                a.href = part;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                a.textContent = part;
+                container.appendChild(a);
+            } else {
+                container.appendChild(document.createTextNode(part));
+            }
+        });
     }
 
     function appendMessage(msg) {
@@ -637,8 +629,29 @@ const AI_MODEL = "openai/gpt-oss-120b";
 
         const textEl = document.createElement('p');
         textEl.className = 'bubble-text' + (msg.deleted ? ' deleted' : '');
-        textEl.textContent = msg.deleted ? T.deleted_msg_text : msg.content;
+        if (msg.deleted) {
+            textEl.textContent = T.deleted_msg_text;
+        } else {
+            renderTextWithLinks(textEl, msg.content);
+        }
         bubble.appendChild(textEl);
+
+        // ===== روابط المصادر (لو الرد ده جه من بحث في الإنترنت) =====
+        if (!msg.deleted && Array.isArray(msg.sources) && msg.sources.length > 0) {
+            const sourcesWrap = document.createElement('div');
+            sourcesWrap.className = 'bubble-sources';
+            msg.sources.forEach((src) => {
+                if (!src || !src.link) return;
+                const link = document.createElement('a');
+                link.className = 'bubble-source-link';
+                link.href = src.link;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.textContent = src.title && src.title.trim() ? src.title : src.link;
+                sourcesWrap.appendChild(link);
+            });
+            if (sourcesWrap.childElementCount > 0) bubble.appendChild(sourcesWrap);
+        }
 
         const meta = document.createElement('div');
         meta.className = 'bubble-meta';
@@ -976,8 +989,8 @@ const AI_MODEL = "openai/gpt-oss-120b";
 
         try {
             const systemPrompt = isAr
-                ? "إنت ChatZone Ai، مساعد ذكاء اصطناعي جوه تطبيق دردشة اسمه ChatZone. ردودك تكون بالعربي المصري البسيط، ودودة ومختصرة ومفيدة، ومنظمة لما يكون المحتوى يحتاج نقط أو خطوات."
-                : "You are ChatZone Ai, an AI assistant inside a chat app called ChatZone. Reply in simple, friendly, concise, and helpful English, and use bullet points or numbered steps when the content needs structure.";
+                ? "إنت ChatZone Ai، مساعد ذكاء اصطناعي جوه تطبيق دردشة اسمه ChatZone. ردودك لازم تكون بسيطة وخفيفة جدًا، جمل قصيرة، من غير تعقيد أو إطالة، وكأنك بتكلم صاحبك على الماشي. متكتبش فقرات طويلة إلا لو المستخدم طلب تفاصيل أكتر. هدفك الأساسي إرضاء العميل: حاول تساعد في أي سؤال أو طلب مهما كان، من غير ما ترفض أو تتهرب بسهولة، وابعد عن العبارات الجافة زي 'معرفش' أو 'مقدرش أساعد' وحاول دايمًا تلاقي طريقة تفيد بيها. الاستثناء الوحيد: لو الطلب فيه أذى حقيقي لشخص (زي تعليمات لعمل سلاح أو أذى جسدي أو محتوى جنسي عن قاصرين)، ارفض بلطف واقترح بديل مفيد. عندك أداة بحث في الإنترنت (web_search) استخدمها لما السؤال محتاج معلومة حديثة أو مش متأكد منها. لو حصل أي مشكلة أو خطأ ومش قادر تساعد المستخدم صح، قوله يتواصل مع الدعم على الرقم ده: 01019569018."
+                : "You are ChatZone Ai, an AI assistant inside a chat app called ChatZone. Keep replies simple and light — short sentences, no over-complication, like chatting with a friend. Avoid long paragraphs unless the user asks for more detail. Your main goal is customer satisfaction: try to help with any question or request, avoid refusing or deflecting easily, skip flat phrases like 'I don't know' or 'I can't help', and always look for a way to be useful. The only exception: if a request involves real harm to someone (like weapon instructions, physical harm, or sexual content involving minors), decline politely and suggest a helpful alternative instead. You have a web_search tool — use it when a question needs current info or you're unsure. If something goes wrong or you can't help properly, tell the user to contact support at this number: 01019569018.";
 
             const apiMessages = history
                 .filter(m => !m.deleted)
@@ -1007,7 +1020,8 @@ const AI_MODEL = "openai/gpt-oss-120b";
             }
 
             const reply = data.reply || T.error_fallback;
-            const aiMsg = { id: nextMsgId(), role: 'assistant', content: reply, ts: Date.now() };
+            const sources = Array.isArray(data.sources) ? data.sources : [];
+            const aiMsg = { id: nextMsgId(), role: 'assistant', content: reply, ts: Date.now(), sources };
             history.push(aiMsg);
             saveHistory(history);
             appendMessage(aiMsg);

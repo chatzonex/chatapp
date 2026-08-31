@@ -9,7 +9,6 @@ import {
     deleteDoc,
     deleteField,
     arrayUnion,
-    arrayRemove,
     collection,
     query,
     orderBy,
@@ -753,10 +752,6 @@ import {
 
         bubble.appendChild(meta);
         inner.appendChild(bubble);
-
-        // ===== شريط الريأكشنز =====
-        renderMessageReactions(bubble, docId, msg.reactions, isMine);
-
         row.appendChild(inner);
         messagesEl.appendChild(row);
 
@@ -992,104 +987,6 @@ import {
         if (msgCtxOverlay) msgCtxOverlay.classList.remove('open');
         document.querySelectorAll('.msg-row.selected').forEach(r => r.classList.remove('selected'));
     }
-
-    // ===================================================
-    // ===== نظام الريأكشنز (إيموجي فوق الرسالة) — نسخة الجروب =====
-    // نفس فكرة الشات الفردي بالظبط، بس المسار هنا
-    // groups/{groupId}/messages بدل chats/{chatId}/messages
-    // ===================================================
-
-    function renderMessageReactions(bubble, docId, reactions, isMine) {
-        const old = bubble.querySelector('.bubble-reactions');
-        if (old) old.remove();
-
-        if (!reactions || typeof reactions !== 'object') return;
-        const entries = Object.entries(reactions).filter(([, uids]) => Array.isArray(uids) && uids.length > 0);
-        if (!entries.length) return;
-
-        const bar = document.createElement('div');
-        bar.className = 'bubble-reactions';
-
-        entries.forEach(([emoji, uids]) => {
-            const mine = myUid && uids.includes(myUid);
-            const pill = document.createElement('div');
-            pill.className = 'bubble-reaction-pill' + (mine ? ' mine' : '');
-            pill.innerHTML = `<span>${emoji}</span>` + (uids.length > 1 ? `<span class="count">${uids.length}</span>` : '');
-            pill.addEventListener('click', () => toggleReaction(docId, emoji));
-            bar.appendChild(pill);
-        });
-
-        bubble.appendChild(bar);
-    }
-
-    async function toggleReaction(docId, emoji) {
-        if (!myUid || !docId) return;
-        const msg = messagesById.get(docId);
-        if (!msg) return;
-
-        const reactions = msg.reactions || {};
-        const alreadyOnThis = Array.isArray(reactions[emoji]) && reactions[emoji].includes(myUid);
-
-        try {
-            const msgRef = doc(db, 'groups', groupId, 'messages', docId);
-            const updates = {};
-
-            Object.keys(reactions).forEach((existingEmoji) => {
-                if (existingEmoji !== emoji && Array.isArray(reactions[existingEmoji]) && reactions[existingEmoji].includes(myUid)) {
-                    updates[`reactions.${existingEmoji}`] = arrayRemove(myUid);
-                }
-            });
-
-            updates[`reactions.${emoji}`] = alreadyOnThis ? arrayRemove(myUid) : arrayUnion(myUid);
-
-            await updateDoc(msgRef, updates);
-            if (navigator.vibrate) { try { navigator.vibrate(8); } catch (e) {} }
-        } catch (e) {
-            console.error('فشل تحديث الريأكشن:', e);
-        }
-    }
-
-    const ctxEmojiBar = document.getElementById('ctxEmojiBar');
-    const ctxEmojiMoreBtn = document.getElementById('ctxEmojiMoreBtn');
-    const ctxEmojiMoreInput = document.getElementById('ctxEmojiMoreInput');
-
-    if (ctxEmojiBar) {
-        ctxEmojiBar.querySelectorAll('.ctx-emoji-btn[data-emoji]').forEach((btn) => {
-            btn.addEventListener('click', () => {
-                const emoji = btn.getAttribute('data-emoji');
-                if (ctxMsgId) toggleReaction(ctxMsgId, emoji);
-                closeMsgCtxMenu();
-            });
-        });
-    }
-
-    if (ctxEmojiMoreBtn && ctxEmojiMoreInput) {
-        ctxEmojiMoreBtn.addEventListener('click', () => {
-            ctxEmojiMoreInput.removeAttribute('readonly');
-            ctxEmojiMoreInput.value = '';
-            ctxEmojiMoreInput.focus();
-        });
-
-        ctxEmojiMoreInput.addEventListener('input', () => {
-            const val = ctxEmojiMoreInput.value.trim();
-            if (!val) return;
-            let emoji = val;
-            try {
-                if (typeof Intl !== 'undefined' && Intl.Segmenter) {
-                    const seg = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
-                    const first = seg.segment(val)[Symbol.iterator]().next();
-                    if (first && !first.done) emoji = first.value.segment;
-                }
-            } catch (e) {}
-
-            if (ctxMsgId) toggleReaction(ctxMsgId, emoji);
-            ctxEmojiMoreInput.value = '';
-            ctxEmojiMoreInput.setAttribute('readonly', 'readonly');
-            ctxEmojiMoreInput.blur();
-            closeMsgCtxMenu();
-        });
-    }
-
     if (msgCtxOverlay) msgCtxOverlay.addEventListener('click', closeMsgCtxMenu);
     if (msgCtxReply) {
         msgCtxReply.addEventListener('click', () => {
