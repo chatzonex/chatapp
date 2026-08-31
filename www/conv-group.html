@@ -9,6 +9,28 @@
         window.location.replace('index.html');
     }
 </script>
+<script>
+    // تطبيق فوري للون خلفية الشات المحفوظ لنفس الجروب ده (قبل أي
+    // رسم) — نفس فكرة conversation.html بالظبط.
+    (function () {
+        try {
+            var params = new URLSearchParams(window.location.search);
+            var candidates = ['id', 'uid', 'chatId', 'conversationId', 'convId', 'groupId', 'gid', 'cid'];
+            var convKey = 'default';
+            for (var i = 0; i < candidates.length; i++) {
+                var v = params.get(candidates[i]);
+                if (v) { convKey = v; break; }
+            }
+            var hex = localStorage.getItem('cz_chat_bg_color__' + convKey);
+            if (hex) {
+                var style = document.createElement('style');
+                style.id = 'earlyChatBgStyle';
+                style.textContent = '#convMessages{background:' + hex + ' !important;}';
+                document.head.appendChild(style);
+            }
+        } catch (e) {}
+    })();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Tajawal:wght@400;500;700&family=Amiri:wght@400;700&family=Reem+Kufi:wght@400;600&family=Lobster&family=Pacifico&family=Dancing+Script:wght@500;700&display=swap" rel="stylesheet">
@@ -17,6 +39,7 @@
 <link rel="stylesheet" href="conversation.css">
 <link rel="stylesheet" href="chatzone-extra.css">
 <link rel="stylesheet" href="conv-group.css">
+<link rel="stylesheet" href="enhancements.css">
 </head>
 <body>
 
@@ -172,9 +195,39 @@
                     <span data-i18n="bubbles_tick_title">لون الصح الزرقاء</span>
                     <svg class="bubble-option-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
+                <div class="bubble-option-row" id="bubbleOptionBg">
+                    <div class="bubble-option-swatch" id="bubbleOptionBgSwatch" style="background:transparent;"></div>
+                    <span>Background color</span>
+                    <svg class="bubble-option-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
             </div>
 
             <button class="bubble-reset-btn" id="bubbleResetBtn" data-i18n="bubbles_reset">إرجاع الافتراضي</button>
+        </div>
+    </div>
+
+    <!-- ===== Sheet: اختيار لون عام (خلفية الشات) — يستخدمه enhancements.js فقط ===== -->
+    <div class="sheet-overlay" id="sheet-pick-app-color">
+        <div class="sheet-box sheet-box-small">
+            <div class="sheet-grabber"></div>
+            <div class="sheet-close" data-close-sheet="sheet-pick-app-color">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="sheet-title" id="pickAppColorTitle">اختر لون</div>
+
+            <div class="app-color-preset-grid" id="appColorPresetGrid"></div>
+
+            <div class="choose-color-item" id="appColorCustomBtn">
+                <div class="choose-color-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.4-1.1-.2-.3-.4-.6-.4-1 0-.8.7-1.5 1.5-1.5H16c3.3 0 6-2.7 6-6 0-4.4-4-8-10-8z"/></svg>
+                </div>
+                <span>لون مخصص (اختر أي لون)</span>
+                <svg class="bubble-option-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+
+            <button class="bubble-reset-btn" id="appColorResetBtn">إرجاع الافتراضي</button>
+
+            <input type="color" id="appColorNativePicker" class="visually-hidden-color-input">
         </div>
     </div>
 
@@ -432,5 +485,6 @@
     </div>
 
     <script type="module" src="conv-group.js"></script>
+    <script type="module" src="enhancements.js"></script>
 </body>
 </html>
