@@ -92,6 +92,129 @@ html[dir="ltr"] .bubble-option-arrow {
     transform: none;
 }
 
+/* ===== [7] Loading Spinner — الشاتس/الجروبس/شاشة المحادثة ===== */
+.cz-loading-spinner-wrap {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    pointer-events: none;
+}
+
+.chats-list,
+.conv-messages {
+    position: relative;
+}
+
+.cz-loading-spinner-wrap-conv {
+    /* الرسايل عمودها flex عادي مش absolute container زي الشاتس،
+       فبنخليها تاخد كل المساحة المتاحة بدل ما تتكسر جوه العمود */
+    flex: 1;
+    width: 100%;
+    position: static;
+}
+
+.cz-loading-spinner {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 3px solid var(--glass-border, rgba(255,255,255,0.12));
+    border-top-color: var(--text-dim, #8A9691);
+    animation: czSpin 0.8s linear infinite;
+}
+
+.cz-loading-spinner-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dim, #8A9691);
+}
+
+@keyframes czSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* ===== [6-ب] AI Splash Intro — أنيميشن الدايرة اللي بتتحول لمربع نص
+   دائري وترجع تاني، مرة واحدة عند فتح MainActivity ===== */
+.ai-splash-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg, #000000);
+    pointer-events: none;
+}
+
+.ai-splash-overlay.ai-splash-done {
+    display: none;
+}
+
+.ai-splash-shape {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(155deg, #2A2E33, #0A0B0D);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    animation: aiSplashShape 2.4s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+.ai-splash-text {
+    font-family: var(--font-display, 'Space Grotesk', sans-serif);
+    font-size: 17px;
+    font-weight: 700;
+    color: #F2F5F4;
+    white-space: nowrap;
+    opacity: 0;
+    animation: aiSplashText 2.4s ease forwards;
+}
+
+/* المرحلة: دايرة صغيرة -> مربع بحرف نص دائري (يمين مستقيم / شمال نص دائرة)
+   -> نرجع تاني للدايرة الصغيرة الأصلية */
+@keyframes aiSplashShape {
+    0% {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+    }
+    35%, 65% {
+        width: 220px;
+        height: 84px;
+        border-radius: 42px 18px 18px 42px;
+    }
+    100% {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+    }
+}
+
+@keyframes aiSplashText {
+    0%, 30% { opacity: 0; }
+    40%, 60% { opacity: 1; }
+    70%, 100% { opacity: 0; }
+}
+
+/* ===== [6] تصغير دايرة ChatZone Ai + خلفية أسود لرمادي (بدل الشفافية القديمة) ===== */
+.chatzone-ai-fab {
+    width: 48px !important;
+    height: 48px !important;
+    background: linear-gradient(155deg, #2A2E33, #0A0B0D) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+}
+
+body.theme-white .chatzone-ai-fab {
+    background: linear-gradient(155deg, #2A2E33, #0A0B0D) !important;
+}
+
 /* ===== شيت اختيار اللون العام (البار السفلي / خلفية الرئيسية) ===== */
 .app-color-preset-grid {
     display: grid;

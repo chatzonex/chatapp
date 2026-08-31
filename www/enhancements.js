@@ -251,6 +251,124 @@
         }
     }
 
+    /* ============================================================
+       [6] AI Splash Intro — مرة واحدة بس لكل جلسة (مش كل مرة يفتح
+       الصفحة أو يرجع من صفحة تانية بنفس الجلسة)
+       ============================================================ */
+
+    var SPLASH_SEEN_KEY = 'cz_ai_splash_seen_session';
+
+    function initAiSplash() {
+        var overlay = $('aiSplashOverlay');
+        if (!overlay) return;
+
+        if (sessionStorage.getItem(SPLASH_SEEN_KEY) === '1') {
+            overlay.remove();
+            return;
+        }
+        sessionStorage.setItem(SPLASH_SEEN_KEY, '1');
+
+        setTimeout(function () {
+            overlay.classList.add('ai-splash-done');
+            setTimeout(function () { overlay.remove(); }, 400);
+        }, 2400);
+    }
+
+    /* ============================================================
+       [7] Loading Spinner — للشاتات، الجروبات، وشاشة المحادثة
+       بيظهر لفترة قصيرة بس وقت التحميل الفعلي، وبيختفي أوتوماتيك
+       (مش هيفضل معلّق لو مفيش نت أو حصلت مشكلة)
+       ============================================================ */
+
+    function buildSpinnerNode() {
+        var wrap = document.createElement('div');
+        wrap.className = 'cz-loading-spinner-wrap';
+        wrap.innerHTML = '<div class="cz-loading-spinner"></div><span class="cz-loading-spinner-label">تحميل</span>';
+        return wrap;
+    }
+
+    // بيراقب container (زي #chatsList) وبيحط سبينر بدل أي empty-state
+    // ثابت موجود في الـ HTML الأصلي وقت التحميل الأول بس، لحد ما
+    // main.js يحط المحتوى الحقيقي (شات فعلي أو "مفيش شاتات" النهائية).
+    //
+    // مهم: السبينر بيشتغل بس لو الـ HTML الأصلي فيه .empty-state (يعني
+    // احتمال إننا في حالة "لسه بيحمّل من فايرستور"). لو مفيش empty-state
+    // ومفيش أي حاجة تانية، معناها المستخدم شايف خلفية سودا عادي —
+    // ومنعملش أي حاجة، بالظبط زي ما اتطلب.
+    function watchListForLoading(containerId, maxWaitMs) {
+        var container = $(containerId);
+        if (!container) return;
+
+        var emptyStateEl = container.querySelector('.empty-state');
+        if (!emptyStateEl) return; // مفيش حالة انتظار معروفة — سيبها زي ما هي
+
+        var spinner = buildSpinnerNode();
+        emptyStateEl.style.display = 'none';
+        container.appendChild(spinner);
+
+        var settled = false;
+        function settle() {
+            if (settled) return;
+            settled = true;
+            observer.disconnect();
+            if (spinner.parentNode) spinner.remove();
+            // مش بنرجّع نص "مفيش شاتات لسه" تاني بناءً على الطلب —
+            // لو فعلاً مفيش شاتات، الشاشة تفضل خلفية سودا فاضية بس
+            // (emptyStateEl بيفضل مخفي دايمًا، سواء فيه شاتات ولا لأ)
+        }
+
+        var observer = new MutationObserver(function () {
+            // أي عنصر جديد اتضاف غير السبينر نفسه = البيانات جت
+            var hasNewContent = false;
+            for (var i = 0; i < container.children.length; i++) {
+                var child = container.children[i];
+                if (child !== spinner && child !== emptyStateEl) { hasNewContent = true; break; }
+            }
+            if (hasNewContent) settle();
+        });
+        observer.observe(container, { childList: true });
+
+        // أمان: مانخليش السبينر يفضل معلّق لو حصلت مشكلة في الشبكة
+        setTimeout(settle, maxWaitMs || 8000);
+    }
+
+    function watchConversationLoading() {
+        var container = $('convMessages');
+        if (!container) return;
+
+        // لو فيه رسايل جاهزة من الأول، مفيش داعي لسبينر
+        if (container.children.length > 0) return;
+
+        var spinner = buildSpinnerNode();
+        spinner.classList.add('cz-loading-spinner-wrap-conv');
+        container.appendChild(spinner);
+
+        var settled = false;
+        function settle() {
+            if (settled) return;
+            settled = true;
+            observer.disconnect();
+            if (spinner.parentNode) spinner.remove();
+        }
+
+        var observer = new MutationObserver(function () {
+            var hasRealContent = false;
+            for (var i = 0; i < container.children.length; i++) {
+                if (container.children[i] !== spinner) { hasRealContent = true; break; }
+            }
+            if (hasRealContent) settle();
+        });
+        observer.observe(container, { childList: true });
+
+        setTimeout(settle, 12000);
+    }
+
+    function initLoadingSpinners() {
+        watchListForLoading('chatsList', 12000);
+        watchListForLoading('groupsList', 12000);
+        watchConversationLoading();
+    }
+
     /* ============ نقطة الدخول: تشغيل حسب الصفحة الحالية ============ */
 
     function init() {
@@ -260,6 +378,9 @@
             initMainActivityColorRows(picker);
             initChatBackgroundOption(picker);
         }
+
+        initAiSplash();
+        initLoadingSpinners();
     }
 
     if (document.readyState === 'loading') {
