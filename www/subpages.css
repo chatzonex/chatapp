@@ -139,35 +139,57 @@ html[dir="rtl"] .subpage-back-btn svg {
 
 .appinfo-footer {
     flex-shrink: 0;
-    padding: 0 22px max(20px, env(safe-area-inset-bottom));
+    padding: 0 20px max(24px, env(safe-area-inset-bottom));
+}
+
+/* ===== كارت المعلومات (زي settings-card بالظبط) + ترانزيشن دخول
+   من أسفل الشاشة (من العدم) عند فتح الصفحة ===== */
+.appinfo-card {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 14px;
+    border-radius: var(--radius-md);
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    padding: 20px 18px;
+    opacity: 0;
+    transform: translateY(36px);
+    animation: appinfoCardEnter 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 0.05s;
 }
 
-html[dir="ltr"] .appinfo-footer {
-    text-align: left;
-}
-
-html[dir="rtl"] .appinfo-footer {
-    text-align: right;
+@keyframes appinfoCardEnter {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .appinfo-footer-line {
-    font-size: 12.5px;
+    font-size: 15px;
     color: var(--text-dim);
-    line-height: 1.7;
+    line-height: 1.8;
+}
+
+html[dir="ltr"] .appinfo-footer-line {
+    text-align: left;
+}
+
+html[dir="rtl"] .appinfo-footer-line {
+    text-align: right;
 }
 
 .appinfo-footer-line b {
     color: var(--text);
     font-weight: 700;
+    font-size: 15.5px;
 }
 
 .appinfo-footer-line a {
     color: var(--accent);
     text-decoration: none;
     font-weight: 700;
+    font-size: 15px;
 }
 
 .appinfo-footer-line a:active {
