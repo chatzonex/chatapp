@@ -252,28 +252,6 @@
     }
 
     /* ============================================================
-       [6] AI Splash Intro — مرة واحدة بس لكل جلسة (مش كل مرة يفتح
-       الصفحة أو يرجع من صفحة تانية بنفس الجلسة)
-       ============================================================ */
-
-    var SPLASH_SEEN_KEY = 'cz_ai_splash_seen_session';
-
-    function initAiSplash() {
-        var overlay = $('aiSplashOverlay');
-        if (!overlay) return;
-
-        if (sessionStorage.getItem(SPLASH_SEEN_KEY) === '1') {
-            overlay.remove();
-            return;
-        }
-        sessionStorage.setItem(SPLASH_SEEN_KEY, '1');
-
-        setTimeout(function () {
-            overlay.classList.add('ai-splash-done');
-            setTimeout(function () { overlay.remove(); }, 400);
-        }, 2400);
-    }
-
     /* ============================================================
        [7] Loading Spinner — للشاتات، الجروبات، وشاشة المحادثة
        بيظهر لفترة قصيرة بس وقت التحميل الفعلي، وبيختفي أوتوماتيك
@@ -379,7 +357,6 @@
             initChatBackgroundOption(picker);
         }
 
-        initAiSplash();
         initLoadingSpinners();
     }
 
