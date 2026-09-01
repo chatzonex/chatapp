@@ -474,22 +474,6 @@
     display: flex;
 }
 
-/* ===== Version badge ===== */
-.version-badge {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 6px;
-    padding: 10px 20px;
-    border-radius: 999px;
-    background: rgba(37, 217, 160, 0.12);
-    border: 1px solid rgba(37, 217, 160, 0.3);
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--accent);
-}
-
 /* ===================================================
    LIQUID GLASS — extends across the whole app when
    "Liquid Glass from icons" is enabled in Settings
