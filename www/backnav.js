@@ -1,5 +1,5 @@
 /* ===================================================
-   BACKNAV.JS (v2 — إصلاح مشكلة قفل التطبيق فجأة)
+   BACKNAV.JS (v3 — إصلاح "خطوة الرجوع الزيادة" من الصفحات الفرعية)
    نظام موحّد للتحكم في زرار/چيستشر الرجوع الفعلي في الموبايل.
 
    القاعدة:
@@ -11,17 +11,22 @@
        * رجوع دايمًا يوديك لصفحة الشتات (MainActivity.html).
    - الصفحات الفرعية بتاعة الإعدادات (HomeSettings, ChatSettings,
      Themes, language-set, AppInfo):
-       * رجوع يوديك لصفحة الإعدادات (MainActivity.html).
+       * رجوع يوديك لصفحة الإعدادات (MainActivity.html) على طول،
+         بدون أي خطوة زيادة أو ضغطة تانية.
 
-   ليه الإصدار القديم كان بيقفل التطبيق غلط:
-   كان بيعمل history.pushState مرة واحدة بس عند تحميل الصفحة.
-   في WebView حقيقي (Capacitor) مفيش "history" تاني غير كده، فأول
-   ضغطة رجوع كانت بتاكل الـ pushState الوحيد ده، وبعدها أي ضغطة
-   رجوع (حتى لو المفروض تودي للشتات مش تقفل التطبيق) كانت بتلاقي
-   الـ history فاضي فيقفل النشاط على طول.
-   الحل: في كل حالة *غير* حالة "الخروج الفعلي المقصود"، بعد أي
-   popstate بنعمل pushState تاني فورًا عشان الحماية تفضل موجودة
-   دايمًا وميحصلش قفل مفاجئ.
+   ليه كان فيه خطوة رجوع "زيادة" لما ترجع من صفحة فرعية:
+   الكود القديم كان بيفتح MainActivity.html عادي، وبعد ما الصفحة
+   تحمّل كانت بتعمل pushGuardState() فورًا، وبعدها (مش قبلها) كانت
+   بتفتح تبويب الإعدادات عن طريق sessionStorage. يعني وقت ما
+   الحماية اتحطت في الـ history، الشاشة الظاهرة فعليًا كانت لسه
+   "الشتات" (قبل ما نفتح تبويب الإعدادات)، فالنظام كان بيتعامل مع
+   أول ضغطة رجوع بعد كده على أساس إنها "من الشتات" مش "من
+   الإعدادات"، فكانت بتضيع خطوة.
+
+   الحل: بنحدد الوجهة (الإعدادات) عن طريق ?tab=settings في نفس
+   رابط الفتح، ونفتح تبويب الإعدادات فورًا أول ما الصفحة تحمّل
+   *قبل* أي pushGuardState، عشان لما الحماية تتحط، الشاشة تبقى
+   فعليًا هي "الإعدادات" من أول لحظة، ومطابقة تمامًا لمنطق الرجوع.
 =================================================== */
 
 (function () {
@@ -38,7 +43,27 @@
         var shell = document.querySelector('.app-shell');
         if (!shell) return;
 
-        // نضمن وجود طبقة حماية واحدة على الأقل من البداية.
+        // لو الصفحة اتفتحت بطلب صريح إننا نروح لتبويب معيّن (جايين
+        // من صفحة فرعية بتاعة الإعدادات مثلاً)، نفتحه فورًا *قبل*
+        // ما نحط أي طبقة حماية، عشان الحماية تتحط وهي فعليًا
+        // مطابقة للشاشة الظاهرة على الشخص.
+        try {
+            var params = new URLSearchParams(window.location.search);
+            var wantedTab = params.get('tab');
+            if (wantedTab === 'settings') {
+                var settingsBtn = document.getElementById('navSettings');
+                if (settingsBtn) settingsBtn.click();
+            }
+            // ننضف الـ URL من الـ query عشان لو الصفحة اتعمل لها
+            // reload لاحقًا (مش من عندنا) متفتحش تبويب الإعدادات
+            // تاني من غير داعي.
+            if (wantedTab && window.history.replaceState) {
+                window.history.replaceState({}, '', window.location.pathname);
+            }
+        } catch (e) {}
+
+        // دلوقتي بس، وبعد ما الشاشة بقت فعلاً مطابقة للمطلوب، نحط
+        // طبقة الحماية.
         pushGuardState();
 
         function getActiveScreenId() {
@@ -66,16 +91,6 @@
             // — مبنعملش pushGuardState تاني، فالضغطة دي بتاخد
             // المستخدم بره التطبيق (السلوك الطبيعي).
         });
-
-        // لو المستخدم راجع من صفحة فرعية (إحنا اللي وديناه هنا)،
-        // افتح تبويب الإعدادات تلقائيًا مرة واحدة.
-        try {
-            if (sessionStorage.getItem('cz_open_tab') === 'settings') {
-                sessionStorage.removeItem('cz_open_tab');
-                var settingsBtn = document.getElementById('navSettings');
-                if (settingsBtn) settingsBtn.click();
-            }
-        } catch (e) {}
     }
 
     /* ============ Conversation / Conv-group ============ */
@@ -116,8 +131,10 @@
         pushGuardState();
 
         function goToSettings() {
-            try { sessionStorage.setItem('cz_open_tab', 'settings'); } catch (e) {}
-            window.location.href = 'MainActivity.html';
+            // بنحدد الوجهة في نفس رابط الفتح (?tab=settings) عشان
+            // MainActivity.html يفتح تبويب الإعدادات فورًا من أول
+            // لحظة تحميل، قبل ما يحط أي طبقة حماية في الـ history.
+            window.location.href = 'MainActivity.html?tab=settings';
         }
 
         window.addEventListener('popstate', function () {

@@ -59,18 +59,17 @@
 
     function goToSettings() {
         // الرجوع من صفحات الإعدادات الفرعية دايمًا بيوديك لصفحة
-        // الإعدادات الرئيسية تاني (MainActivity على تبويب الإعدادات).
-        // لو backnav.js محمّل، بيبقى فيه "طبقة حماية" في الـ history
-        // فبنستخدم history.back() عشان نفس منطق زرار/چيستشر الرجوع
-        // الفعلي في الموبايل يتطبق برضه على الزرار اللي في الشاشة.
-        // لو backnav.js مش محمّل لأي سبب، بنرجع لصفحة الإعدادات مباشرة.
-        try {
-            sessionStorage.setItem('cz_open_tab', 'settings');
-        } catch (e) {}
+        // الإعدادات الرئيسية تاني (MainActivity على تبويب الإعدادات)
+        // على طول من غير خطوة زيادة. لو backnav.js محمّل، بيبقى
+        // فيه "طبقة حماية" في الـ history فبنستخدم history.back()
+        // عشان نفس منطق زرار/چيستشر الرجوع الفعلي في الموبايل
+        // يتطبق برضه على الزرار اللي في الشاشة (backnav.js هو اللي
+        // بيحدد الوجهة الصح ?tab=settings). لو backnav.js مش محمّل
+        // لأي سبب، بنرجع لصفحة الإعدادات مباشرة.
         if (window.history && window.history.length > 1) {
             window.history.back();
         } else {
-            window.location.href = 'MainActivity.html';
+            window.location.href = 'MainActivity.html?tab=settings';
         }
     }
 
