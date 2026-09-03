@@ -1,3 +1,12 @@
+/* ===== خط التطبيق (خط الآيفون الأصلي) ===== */
+@font-face {
+    font-family: 'iPhoneFont';
+    src: url('iphone-font.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -13,7 +22,7 @@ html, body {
 }
 
 body {
-    font-family: 'IBM Plex Sans Arabic', 'Inter', sans-serif;
+    font-family: 'iPhoneFont', 'IBM Plex Sans Arabic', 'Inter', sans-serif;
     background: var(--bg);
     color: var(--text);
     transition: background 0.25s ease, color 0.25s ease;
@@ -36,7 +45,7 @@ body {
     --grad: linear-gradient(120deg, var(--accent), var(--violet));
     --radius-lg: 22px;
     --radius-md: 16px;
-    --font-display: 'Space Grotesk', 'Inter', sans-serif;
+    --font-display: 'iPhoneFont', 'Space Grotesk', 'Inter', sans-serif;
 }
 
 .app-shell {
