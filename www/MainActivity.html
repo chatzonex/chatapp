@@ -68,6 +68,7 @@
 <link rel="stylesheet" href="settings.css">
 <link rel="stylesheet" href="chatzone-extra.css">
 <link rel="stylesheet" href="enhancements.css">
+<link rel="stylesheet" href="hidden-chats.css">
 </head>
 <body>
 
@@ -467,7 +468,134 @@
             </button>
         </nav>
 
+        <!-- ============================================================
+             ===== Hidden Chats Feature (شات مخفي بباسورد) =====
+             كل الواجهات دي مستقلة تمامًا عن باقي التطبيق، وبتتفعّل بس
+             من خلال الضغط المطول على أيقونة CHATS تحت أو الضغط العادي
+             عليها لو الباسورد موجود بالفعل.
+        ============================================================ -->
+
+        <!-- ===== Overlay 1: اختيار نوع الباسورد (PIN / Pattern) عند الإنشاء أول مرة ===== -->
+        <div class="hc-overlay" id="hcChooseTypeOverlay">
+            <div class="hc-overlay-box">
+                <button class="hc-overlay-close" id="hcChooseTypeClose" aria-label="إغلاق">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+                <div class="hc-overlay-title">إنشاء باسورد للشاتات المخفية</div>
+                <div class="hc-overlay-sub">اختار طريقة الحماية اللي تناسبك</div>
+
+                <div class="hc-type-options">
+                    <button class="hc-type-option" id="hcTypePinBtn" data-type="pin">
+                        <div class="hc-type-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="10" rx="2"/><circle cx="12" cy="14" r="1.6"/><path d="M7 9V6a5 5 0 0 1 10 0v3"/></svg>
+                        </div>
+                        <div class="hc-type-name">PIN</div>
+                        <div class="hc-type-desc">باسورد أرقام (6 أرقام)</div>
+                    </button>
+                    <button class="hc-type-option" id="hcTypePatternBtn" data-type="pattern">
+                        <div class="hc-type-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="5" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="5" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="5" r="1.6" fill="currentColor" stroke="none"/><circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="5" cy="19" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="19" r="1.6" fill="currentColor" stroke="none"/><path d="M5 5L12 12L19 19"/></svg>
+                        </div>
+                        <div class="hc-type-name">Pattern</div>
+                        <div class="hc-type-desc">نقش برسم بين النقط</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== Overlay 2: شاشة إدخال/إنشاء/تأكيد PIN أو Pattern (شاشة كاملة) ===== -->
+        <div class="hc-overlay hc-overlay-fullscreen" id="hcPassOverlay">
+            <div class="hc-pass-header">
+                <button class="hc-pass-back" id="hcPassBack" aria-label="رجوع">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+            </div>
+
+            <div class="hc-pass-body">
+                <div class="hc-pass-icon" id="hcPassIcon">🔒</div>
+                <div class="hc-pass-title" id="hcPassTitle">اكتب الباسورد</div>
+                <div class="hc-pass-sub" id="hcPassSub"></div>
+
+                <!-- PIN dots (يظهر بس لو النوع PIN) -->
+                <div class="hc-pin-dots" id="hcPinDots">
+                    <span class="hc-pin-dot"></span>
+                    <span class="hc-pin-dot"></span>
+                    <span class="hc-pin-dot"></span>
+                    <span class="hc-pin-dot"></span>
+                    <span class="hc-pin-dot"></span>
+                    <span class="hc-pin-dot"></span>
+                </div>
+
+                <!-- Pattern grid (يظهر بس لو النوع Pattern) -->
+                <div class="hc-pattern-wrap hidden" id="hcPatternWrap">
+                    <svg class="hc-pattern-lines" id="hcPatternLines" viewBox="0 0 300 300"></svg>
+                    <div class="hc-pattern-grid" id="hcPatternGrid"></div>
+                </div>
+
+                <div class="hc-pass-error hidden" id="hcPassError">الباسورد غير مطابق، حاول تاني</div>
+            </div>
+
+            <!-- PIN numeric keypad (يظهر بس لو النوع PIN) -->
+            <div class="hc-keypad" id="hcKeypad">
+                <button class="hc-key" data-key="1">1</button>
+                <button class="hc-key" data-key="2">2</button>
+                <button class="hc-key" data-key="3">3</button>
+                <button class="hc-key" data-key="4">4</button>
+                <button class="hc-key" data-key="5">5</button>
+                <button class="hc-key" data-key="6">6</button>
+                <button class="hc-key" data-key="7">7</button>
+                <button class="hc-key" data-key="8">8</button>
+                <button class="hc-key" data-key="9">9</button>
+                <div class="hc-key hc-key-empty"></div>
+                <button class="hc-key" data-key="0">0</button>
+                <button class="hc-key hc-key-del" id="hcKeyDel" aria-label="مسح">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== Hidden Chats Screen (شاشة الشاتات المخفية — جوه نفس الصفحة) ===== -->
+        <section class="screen hidden" id="screen-hidden-chats">
+            <header class="topbar">
+                <div class="topbar-actions">
+                    <button class="icon-btn" id="hcMenuBtn" aria-label="خيارات">
+                        <span class="dots">
+                            <span></span><span></span><span></span>
+                        </span>
+                    </button>
+                    <button class="icon-btn" id="hcBackToMainBtn" aria-label="رجوع">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                    </button>
+                </div>
+                <h1 class="topbar-title">الشاتات المخفية</h1>
+            </header>
+
+            <div class="chats-list" id="hiddenChatsList">
+                <div class="empty-state">
+                    <div class="empty-icon">🔒</div>
+                    <p class="empty-title">مفيش شاتات مخفية</p>
+                    <p class="empty-sub">أي شات تخفيه هيظهر هنا</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- قايمة خيارات (تلات نقط) داخل شاشة الشاتات المخفية -->
+        <div class="sheet-overlay" id="sheet-hc-menu">
+            <div class="sheet-box">
+                <div class="sheet-grabber"></div>
+                <div class="sheet-close" data-close-sheet="sheet-hc-menu">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </div>
+                <button class="menu-sheet-item" id="hcChangePassBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <span>تغيير الباسورد</span>
+                </button>
+            </div>
+        </div>
+
     </div>
+
+    <script type="module" src="hidden-chats.js"></script>
 
     <script type="module" src="main.js"></script>
     <script type="module" src="settings.js"></script>

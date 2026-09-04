@@ -1,0 +1,418 @@
+/* ===================================================
+   HIDDEN-CHATS.CSS
+   تنسيق ميزة "الشاتات المخفية": اختيار نوع الباسورد، شاشة
+   PIN/Pattern، شاشة الشاتات المخفية، زرار العين على كل شات،
+   ونبضة أيقونة CHATS تحت.
+=================================================== */
+
+/* ===== الأوفرلاي العام (اختيار PIN / Pattern) ===== */
+.hc-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease;
+}
+
+.hc-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.hc-overlay-box {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--glass-border);
+    border-radius: 26px 26px 0 0;
+    padding: 34px 22px 30px;
+    transform: translateY(24px);
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hc-overlay.open .hc-overlay-box {
+    transform: translateY(0);
+}
+
+.hc-overlay-close {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--glass);
+    border: none;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.hc-overlay-title {
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--text);
+    text-align: center;
+    margin-bottom: 6px;
+}
+
+.hc-overlay-sub {
+    font-size: 13.5px;
+    color: var(--text-dim);
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+/* ===== اختيار PIN / Pattern ===== */
+.hc-type-options {
+    display: flex;
+    gap: 14px;
+}
+
+.hc-type-option {
+    flex: 1;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    padding: 20px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.hc-type-option:active,
+.hc-type-option:hover {
+    background: var(--glass-strong);
+    border-color: var(--glass-border-strong);
+}
+
+.hc-type-icon {
+    width: 40px;
+    height: 40px;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hc-type-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.hc-type-name {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.hc-type-desc {
+    font-size: 11.5px;
+    color: var(--text-dim);
+    text-align: center;
+    line-height: 1.4;
+}
+
+/* ===== شاشة PIN / Pattern الكاملة ===== */
+.hc-overlay-fullscreen {
+    align-items: stretch;
+    justify-content: stretch;
+    background: var(--bg);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+.hc-overlay-fullscreen .hc-pass-header,
+.hc-overlay-fullscreen .hc-pass-body,
+.hc-overlay-fullscreen .hc-keypad {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.hc-overlay-fullscreen.open .hc-pass-header,
+.hc-overlay-fullscreen.open .hc-pass-body,
+.hc-overlay-fullscreen.open .hc-keypad {
+    opacity: 1;
+}
+
+.hc-pass-header {
+    display: flex;
+    align-items: center;
+    padding: 22px 18px 0;
+    flex-shrink: 0;
+}
+
+.hc-pass-back {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--glass);
+    border: none;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.hc-pass-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 24px;
+    text-align: center;
+    gap: 6px;
+}
+
+.hc-pass-icon {
+    font-size: 34px;
+    margin-bottom: 6px;
+}
+
+.hc-pass-title {
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.hc-pass-sub {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 18px;
+    min-height: 16px;
+}
+
+.hc-pass-error {
+    font-size: 13px;
+    color: #FF5C5C;
+    margin-top: 16px;
+    font-weight: 600;
+}
+
+.hc-pass-error.hidden {
+    display: none;
+}
+
+/* ===== نقط الـ PIN ===== */
+.hc-pin-dots {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    margin-top: 4px;
+}
+
+.hc-pin-dot {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: 1.6px solid var(--glass-border-strong);
+    background: transparent;
+    transition: background 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+}
+
+.hc-pin-dot.filled {
+    background: var(--accent);
+    border-color: var(--accent);
+    transform: scale(1.12);
+}
+
+.hc-pin-dot.shake-error {
+    border-color: #FF5C5C;
+}
+
+@keyframes hc-shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-8px); }
+    80% { transform: translateX(8px); }
+}
+
+.hc-pin-dots.shake {
+    animation: hc-shake 0.4s ease;
+}
+
+/* ===== لوحة مفاتيح PIN ===== */
+.hc-keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    padding: 10px 34px 34px;
+    flex-shrink: 0;
+}
+
+.hc-key {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 600;
+    height: 68px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.12s ease;
+}
+
+.hc-key:active {
+    background: var(--glass-strong);
+}
+
+.hc-key-empty {
+    pointer-events: none;
+}
+
+.hc-key-del {
+    color: var(--text-dim);
+}
+
+.hc-keypad.hidden {
+    display: none;
+}
+
+/* ===== Pattern (النقش) ===== */
+.hc-pattern-wrap {
+    position: relative;
+    width: 260px;
+    height: 260px;
+    margin: 8px auto 0;
+}
+
+.hc-pattern-wrap.hidden {
+    display: none;
+}
+
+.hc-pattern-lines {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.hc-pattern-lines line {
+    stroke: var(--accent);
+    stroke-width: 4;
+    stroke-linecap: round;
+}
+
+.hc-pattern-grid {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    touch-action: none;
+}
+
+.hc-pattern-dot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hc-pattern-dot-inner {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--glass-border-strong);
+    background: var(--bg-elevated);
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    pointer-events: none;
+}
+
+.hc-pattern-dot.active .hc-pattern-dot-inner {
+    background: var(--accent);
+    border-color: var(--accent);
+    transform: scale(1.3);
+}
+
+.hc-pattern-dot.error .hc-pattern-dot-inner {
+    background: #FF5C5C;
+    border-color: #FF5C5C;
+}
+
+.hc-pattern-wrap.shake {
+    animation: hc-shake 0.4s ease;
+}
+
+.hc-pattern-wrap.shake .hc-pattern-lines line {
+    stroke: #FF5C5C;
+}
+
+/* ===== زرار العين (إخفاء شات) على أفتار كل شات ===== */
+.chat-row {
+    position: relative;
+}
+
+.hc-hide-eye-btn {
+    position: absolute;
+    top: -4px;
+    inset-inline-end: -4px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--bg-elevated);
+    border: 1.5px solid var(--glass-border-strong);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: var(--text);
+    cursor: pointer;
+    z-index: 3;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.chat-row.hc-eye-visible .hc-hide-eye-btn {
+    display: flex;
+}
+
+.hc-hide-eye-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* ===== نبضة أيقونة CHATS (تنبيه رسالة جديدة في شات مخفي) ===== */
+@keyframes hc-icon-pulse {
+    0% { transform: scale(1); }
+    25% { transform: scale(1.22); }
+    50% { transform: scale(1); }
+    75% { transform: scale(1.22); }
+    100% { transform: scale(1); }
+}
+
+#navChats.hc-pulse .nav-icon-selected,
+#navChats.hc-pulse svg {
+    animation: hc-icon-pulse 0.5s ease-in-out 3;
+}
+
+/* ===== حالة تحميل بسيطة (spinner) على أزرار Firebase ===== */
+.hc-loading {
+    opacity: 0.55;
+    pointer-events: none;
+}
