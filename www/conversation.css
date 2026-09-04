@@ -269,6 +269,13 @@ html[dir="ltr"] .conv-about-toast {
     max-height: 82vh;
     border-radius: 12px;
     object-fit: contain;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.photo-viewer-img:active {
+    cursor: grabbing;
 }
 
 .photo-viewer-close {
