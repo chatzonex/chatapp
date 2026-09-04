@@ -210,6 +210,11 @@ import {
         }
 
         function handleStart(clientX, clientY) {
+            // لو الشبكة لسه معندهاش أبعاد حقيقية (لسه بتتحمّل / مخفية)
+            // بنتجاهل اللمسة بدل ما نقبل نقطة غلط.
+            const gridRect = els.patternGrid.getBoundingClientRect();
+            if (gridRect.width === 0 || gridRect.height === 0) return;
+
             resetPatternUI();
             drawing = true;
             const idx = cellFromPoint(clientX, clientY);
@@ -371,12 +376,16 @@ import {
         if (type === 'pin') {
             keypadCleanup = setupKeypad(onCreateFirstEntry);
         } else {
-            patternCleanup = setupPatternInput(onCreateFirstEntry);
+            setTimeout(() => {
+                patternCleanup = setupPatternInput(onCreateFirstEntry);
+            }, 0);
         }
     }
 
     function onCreateFirstEntry(value) {
-        state.pendingValue = value;
+        // ناخد نسخة تانية مستقلة من القيمة عشان مفيش أي مرجع مشترك
+        // ممكن يتغيّر لاحقًا (مصفوفة الـ pattern بالذات).
+        state.pendingValue = Array.isArray(value) ? value.slice() : value;
         state.mode = 'create-confirm';
 
         if (state.passType === 'pin') {
@@ -386,11 +395,17 @@ import {
             keypadCleanup && keypadCleanup();
             keypadCleanup = setupKeypad(onCreateConfirmEntry);
         } else {
-            resetPatternUI();
             els.passTitle.textContent = 'أكّد الـ Pattern';
             els.passSub.textContent = 'ارسم نفس النقش تاني للتأكيد';
             patternCleanup && patternCleanup();
-            patternCleanup = setupPatternInput(onCreateConfirmEntry);
+            // بنأجل إعادة بناء شاشة الـ pattern لأول Tick تاني (بعد ما
+            // حدث الـ mouseup/touchend الحالي يخلص يتنفذ تمامًا)، عشان
+            // نضمن إن الـ listeners القديمة اتشالت فعلاً قبل ما نبدأ
+            // نسجل جداد، ومفيش أي نقطة إضافية بتتسجل غلط من نفس اللمسة.
+            setTimeout(() => {
+                resetPatternUI();
+                patternCleanup = setupPatternInput(onCreateConfirmEntry);
+            }, 0);
         }
     }
 
@@ -460,7 +475,9 @@ import {
         if (authDoc.type === 'pin') {
             keypadCleanup = setupKeypad((value) => onVerifyEntry(value, authDoc));
         } else {
-            patternCleanup = setupPatternInput((value) => onVerifyEntry(value, authDoc));
+            setTimeout(() => {
+                patternCleanup = setupPatternInput((value) => onVerifyEntry(value, authDoc));
+            }, 0);
         }
     }
 
