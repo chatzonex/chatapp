@@ -1,0 +1,122 @@
+/* ===================================================
+   EMOJI-FEATURE.CSS
+   ستايل زرار الإيموجي وبيكر الإيموجي بستايل iOS
+   إضافة جديدة فوق التطبيق، بدون تعديل أي ملف أصلي
+=================================================== */
+
+/* ===== زرار فتح البيكر (جنب خانة الكتابة) ===== */
+.cz-emoji-trigger-btn {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--text-dim, #8A9691);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    align-self: flex-end;
+    margin-bottom: 1px;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.cz-emoji-trigger-btn svg {
+    width: 22px;
+    height: 22px;
+}
+
+.cz-emoji-trigger-btn:active {
+    background: var(--glass-strong);
+    color: var(--accent, #25D9A0);
+}
+
+/* ===== الطبقة الخلفية للبيكر ===== */
+.cz-emoji-picker-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 9999;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.cz-emoji-picker-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ===== الشيت نفسه ===== */
+.cz-emoji-picker-sheet {
+    width: 100%;
+    max-width: 480px;
+    max-height: 62vh;
+    max-height: 62dvh;
+    background: var(--bg, #0B0F14);
+    border: 1px solid var(--glass-border, rgba(255,255,255,0.12));
+    border-radius: 22px 22px 0 0;
+    padding: 10px 10px calc(14px + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    flex-direction: column;
+    transform: translateY(100%);
+    transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.35);
+}
+
+.cz-emoji-picker-overlay.open .cz-emoji-picker-sheet {
+    transform: translateY(0);
+}
+
+.cz-emoji-picker-handle {
+    width: 40px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--glass-border, rgba(255,255,255,0.2));
+    margin: 2px auto 10px;
+    flex-shrink: 0;
+}
+
+/* ===== شبكة الإيموجي ===== */
+.cz-emoji-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    overflow-y: auto;
+    padding: 2px 2px 6px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.cz-emoji-picker-cell {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.12s ease;
+}
+
+.cz-emoji-picker-cell:active {
+    background: var(--glass-strong, rgba(255,255,255,0.08));
+    transform: scale(0.88);
+}
+
+/* ===== صورة الإيموجي المفردة (زرار الاختيار في الشبكة) ===== */
+.cz-emoji-picker-cell .cz-emoji-img {
+    pointer-events: none;
+}
+
+/* ===== الإيموجي داخل فقاعة الرسالة ===== */
+.bubble-text .cz-emoji-img {
+    vertical-align: -5px;
+}
+
+.bubble.cz-has-emoji .bubble-text {
+    line-height: 1.6;
+}
