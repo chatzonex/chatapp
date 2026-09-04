@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<script src="lang-flash-guard.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>ChatZone — معلومات التطبيق</title>
+<script>
+    if (!localStorage.getItem('cz_verified_email')) {
+        window.location.replace('index.html');
+    }
+</script>
+<script>
+    (function () {
+        try {
+            var theme = localStorage.getItem('cz_theme') || 'dark';
+            var lang = localStorage.getItem('cz_lang') || 'ar';
+            var html = document.documentElement;
+            html.lang = lang;
+            html.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+            var moveToBody = function () {
+                if (!document.body) return;
+                if (theme === 'white') document.body.classList.add('theme-white');
+            };
+            if (document.body) {
+                moveToBody();
+            } else {
+                new MutationObserver(function (_, obs) {
+                    if (document.body) { moveToBody(); obs.disconnect(); }
+                }).observe(document.documentElement, { childList: true });
+            }
+        } catch (e) {}
+    })();
+</script>
+<link rel="stylesheet" href="main.css">
+<link rel="stylesheet" href="settings.css">
+<link rel="stylesheet" href="conversation.css">
+<link rel="stylesheet" href="chatzone-extra.css">
+<link rel="stylesheet" href="enhancements.css">
+<link rel="stylesheet" href="subpages.css">
+</head>
+<body>
+
+    <div class="subpage-shell">
+
+        <header class="subpage-topbar">
+            <button class="subpage-back-btn" id="subpageBackBtn" aria-label="رجوع">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+            <h1 class="subpage-title" data-i18n="about_title">معلومات عنا</h1>
+        </header>
+
+        <div class="appinfo-center">
+            <img src="chatzone.png" alt="ChatZone" class="appinfo-logo">
+        </div>
+
+        <div class="appinfo-footer">
+            <p class="appinfo-footer-line" data-i18n="appinfo_developer">
+                <span class="appinfo-line-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>
+                </span>
+                <b data-i18n="appinfo_developer_label">مطور التطبيق:</b> محمد اشرف
+            </p>
+            <p class="appinfo-footer-line">
+                <span class="appinfo-line-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                </span>
+                <b data-i18n="appinfo_telegram_label">قناة التليجرام:</b>
+                <a href="https://t.me/mamodsx" target="_blank" rel="noopener">MAMods</a>
+            </p>
+            <p class="appinfo-footer-line">
+                <span class="appinfo-line-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+                </span>
+                <b data-i18n="appinfo_contact_label">التحدث مع المطور:</b>
+                <a href="mailto:chatzone20@gmail.com">chatzone20@gmail.com</a>
+            </p>
+            <p class="appinfo-footer-line">
+                <span class="appinfo-line-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                </span>
+                <b data-i18n="appinfo_version_label">اصدار التطبيق:</b> 1.0.0
+            </p>
+        </div>
+
+    </div>
+
+    <script type="module" src="settings.js"></script>
+    <script src="backnav.js"></script>
+    <script src="subpages-nav.js"></script>
+</body>
+</html>

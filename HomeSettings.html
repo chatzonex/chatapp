@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<script src="lang-flash-guard.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>ChatZone — الصفحة الرئيسية</title>
+<script>
+    if (!localStorage.getItem('cz_verified_email')) {
+        window.location.replace('index.html');
+    }
+</script>
+<script>
+    (function () {
+        try {
+            var theme = localStorage.getItem('cz_theme') || 'dark';
+            var lang = localStorage.getItem('cz_lang') || 'ar';
+            var html = document.documentElement;
+            html.lang = lang;
+            html.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+
+            var flags = {
+                bottombar: localStorage.getItem('cz_lg_bottombar') === 'on',
+                icons: localStorage.getItem('cz_lg_icons') === 'on'
+            };
+            if (flags.bottombar) html.classList.add('lg-bottombar-on');
+            if (flags.icons) html.classList.add('lg-icons-on');
+
+            var bottombar = localStorage.getItem('cz_bottombar_color');
+            var mainBg = localStorage.getItem('cz_main_bg_color');
+            if (bottombar) html.style.setProperty('--bottombar-bg', bottombar);
+            if (mainBg) html.style.setProperty('--bg', mainBg);
+
+            var moveToBody = function () {
+                if (!document.body) return;
+                if (theme === 'white') document.body.classList.add('theme-white');
+                if (flags.bottombar) document.body.classList.add('lg-bottombar-on');
+                if (flags.icons) document.body.classList.add('lg-icons-on');
+            };
+            if (document.body) {
+                moveToBody();
+            } else {
+                new MutationObserver(function (_, obs) {
+                    if (document.body) { moveToBody(); obs.disconnect(); }
+                }).observe(document.documentElement, { childList: true });
+            }
+        } catch (e) {}
+    })();
+</script>
+<link rel="stylesheet" href="main.css">
+<link rel="stylesheet" href="settings.css">
+<link rel="stylesheet" href="conversation.css">
+<link rel="stylesheet" href="chatzone-extra.css">
+<link rel="stylesheet" href="enhancements.css">
+<link rel="stylesheet" href="subpages.css">
+</head>
+<body>
+
+    <div class="subpage-shell">
+
+        <header class="subpage-topbar">
+            <button class="subpage-back-btn" id="subpageBackBtn" aria-label="رجوع">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+            <h1 class="subpage-title" data-i18n="nav_chats_row">الصفحة الرئيسية</h1>
+        </header>
+
+        <div class="subpage-scroll">
+
+            <p class="subpage-desc" data-i18n="lg_body">فعّل أو ألغِ كل تأثير Liquid Glass على حدة. كل شيء متوقف افتراضياً.</p>
+
+            <div class="lg-warning">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:1px;"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <span data-i18n="lg_warning">مُوصى به فقط للأجهزة القوية. قد يحدث بطء بسيط على الأجهزة الأضعف.</span>
+            </div>
+
+            <div class="lg-toggle-row">
+                <div class="lg-toggle-text">
+                    <h5 data-i18n="lg_home_toggle_title">الزجاج السائل في الرئيسية</h5>
+                    <p data-i18n="lg_bottombar_sub">شريط تنقل زجاجي شفاف</p>
+                </div>
+                <label class="ios-switch">
+                    <input type="checkbox" id="lgSwitch-bottombar">
+                    <span class="ios-switch-track"><span class="ios-switch-thumb"></span></span>
+                </label>
+            </div>
+
+            <div class="lg-toggle-row">
+                <div class="lg-toggle-text">
+                    <h5 data-i18n="lg_icons_home_title">الزجاج السائل في الأيقونة</h5>
+                    <p data-i18n="lg_icons_sub">طبّق خامة الزجاج على الأزرار الدائرية</p>
+                </div>
+                <label class="ios-switch">
+                    <input type="checkbox" id="lgSwitch-icons">
+                    <span class="ios-switch-track"><span class="ios-switch-thumb"></span></span>
+                </label>
+            </div>
+
+            <!-- ===== لون البار السفلي ===== -->
+            <div class="theme-color-row" id="bottombarColorRow" style="margin-top:14px;">
+                <div class="theme-color-swatch" id="bottombarColorSwatch"></div>
+                <span class="theme-color-label" data-i18n="bottombar_color_pick">لون البار السفلي</span>
+                <span class="theme-color-hex" id="bottombarColorHex"></span>
+            </div>
+
+            <!-- ===== لون خلفية الرئيسية ===== -->
+            <div class="theme-color-row" id="mainBgColorRow" style="margin-top:10px;">
+                <div class="theme-color-swatch" id="mainBgColorSwatch"></div>
+                <span class="theme-color-label" data-i18n="mainbg_color_pick">لون خلفية الرئيسية</span>
+                <span class="theme-color-hex" id="mainBgColorHex"></span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ===== شيت اختيار لون عام (بيستخدمه enhancements.js لصفوف البار السفلي / خلفية الرئيسية) ===== -->
+    <div class="sheet-overlay" id="sheet-pick-app-color">
+        <div class="sheet-box sheet-box-small">
+            <div class="sheet-grabber"></div>
+            <div class="sheet-close" data-close-sheet="sheet-pick-app-color">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="sheet-title" id="pickAppColorTitle">اختر لون</div>
+
+            <div class="app-color-preset-grid" id="appColorPresetGrid"></div>
+
+            <div class="choose-color-item" id="appColorCustomBtn">
+                <div class="choose-color-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.4-1.1-.2-.3-.4-.6-.4-1 0-.8.7-1.5 1.5-1.5H16c3.3 0 6-2.7 6-6 0-4.4-4-8-10-8z"/></svg>
+                </div>
+                <span data-i18n="custom_color_option">لون مخصص (اختر أي لون)</span>
+                <svg class="bubble-option-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+
+            <button class="bubble-reset-btn" id="appColorResetBtn" data-i18n="reset_default">إرجاع الافتراضي</button>
+
+            <input type="color" id="appColorNativePicker" class="visually-hidden-color-input">
+        </div>
+    </div>
+
+    <script type="module" src="settings.js"></script>
+    <script src="enhancements.js"></script>
+    <script src="backnav.js"></script>
+    <script src="subpages-nav.js"></script>
+</body>
+</html>

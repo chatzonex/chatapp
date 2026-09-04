@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<script src="lang-flash-guard.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>ChatZone — لغة التطبيق</title>
+<script>
+    if (!localStorage.getItem('cz_verified_email')) {
+        window.location.replace('index.html');
+    }
+</script>
+<script>
+    (function () {
+        try {
+            var theme = localStorage.getItem('cz_theme') || 'dark';
+            var lang = localStorage.getItem('cz_lang') || 'ar';
+            var html = document.documentElement;
+            html.lang = lang;
+            html.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+            var moveToBody = function () {
+                if (!document.body) return;
+                if (theme === 'white') document.body.classList.add('theme-white');
+            };
+            if (document.body) {
+                moveToBody();
+            } else {
+                new MutationObserver(function (_, obs) {
+                    if (document.body) { moveToBody(); obs.disconnect(); }
+                }).observe(document.documentElement, { childList: true });
+            }
+        } catch (e) {}
+    })();
+</script>
+<link rel="stylesheet" href="main.css">
+<link rel="stylesheet" href="settings.css">
+<link rel="stylesheet" href="conversation.css">
+<link rel="stylesheet" href="chatzone-extra.css">
+<link rel="stylesheet" href="enhancements.css">
+<link rel="stylesheet" href="subpages.css">
+</head>
+<body>
+
+    <div class="subpage-shell">
+
+        <header class="subpage-topbar">
+            <button class="subpage-back-btn" id="subpageBackBtn" aria-label="رجوع">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+            <h1 class="subpage-title" data-i18n="lang_title">لغة التطبيق</h1>
+        </header>
+
+        <div class="subpage-scroll">
+
+            <p class="subpage-desc" data-i18n="lang_body">اختر لغتك المفضلة، وسيتم تحديث الأبب فوراً.</p>
+
+            <div class="lang-options">
+                <div class="lang-option selected" id="lang-opt-ar" data-lang="ar">
+                    <div class="lang-flag">🇪🇬</div>
+                    <div class="lang-info"><h4>العربية</h4><p>Arabic</p></div>
+                    <div class="lang-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                </div>
+                <div class="lang-option" id="lang-opt-en" data-lang="en">
+                    <div class="lang-flag">🇬🇧</div>
+                    <div class="lang-info"><h4>English</h4><p>الإنجليزية</p></div>
+                    <div class="lang-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script type="module" src="settings.js"></script>
+    <script src="backnav.js"></script>
+    <script src="subpages-nav.js"></script>
+</body>
+</html>
