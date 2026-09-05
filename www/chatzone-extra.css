@@ -1,0 +1,641 @@
+.bubble.bubble-right::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    right: -8px;
+    width: 26px;
+    height: 21px;
+    background: var(--bubble-mine-bg, #FFFFFF);
+    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 28'><path d='M 0 0 C 0 10, 2 16, 8 20 C 14 24, 22 25, 30 27 C 33 27.6, 34 26.5, 32 24.5 C 25 18, 22 12, 22 4 C 22 1.5, 20 0, 17 0 Z' fill='black'/></svg>");
+    mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 28'><path d='M 0 0 C 0 10, 2 16, 8 20 C 14 24, 22 25, 30 27 C 33 27.6, 34 26.5, 32 24.5 C 25 18, 22 12, 22 4 C 22 1.5, 20 0, 17 0 Z' fill='black'/></svg>");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}
+
+.bubble.bubble-left::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: -8px;
+    width: 26px;
+    height: 21px;
+    background: var(--bubble-theirs-bg, #FFFFFF);
+    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 28'><path d='M 34 0 C 34 10, 32 16, 26 20 C 20 24, 12 25, 4 27 C 1 27.6, 0 26.5, 2 24.5 C 9 18, 12 12, 12 4 C 12 1.5, 14 0, 17 0 Z' fill='black'/></svg>");
+    mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 28'><path d='M 34 0 C 34 10, 32 16, 26 20 C 20 24, 12 25, 4 27 C 1 27.6, 0 26.5, 2 24.5 C 9 18, 12 12, 12 4 C 12 1.5, 14 0, 17 0 Z' fill='black'/></svg>");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}
+
+/* ===== ذيل فقاعة ChatZone Ai ===== */
+/* ذيل فقاعة الـ AI (bubble-left مع كلاس bubble-ai) لازم ياخد نفس
+   لون خلفية bubble-ai بالظبط (#1B2027 / أبيض في الثيم الفاتح)،
+   مش لون بابل الطرف التاني العادي، عشان يندمج مع الفقاعة بدل
+   ما يبان بلون مختلف واضح زي ما كان بيحصل قبل كده */
+.bubble.bubble-ai::after {
+    background: #1B2027;
+}
+body.theme-white .bubble.bubble-ai::after {
+    background: #F0F4F2;
+}
+
+/* ===== Pinned chat row indicator ===== */
+.chat-row-pinned {
+    order: -1;
+}
+
+.chat-row-pin-icon {
+    width: 13px;
+    height: 13px;
+    color: var(--text-faint);
+    flex-shrink: 0;
+    margin-inline-end: 2px;
+}
+
+.chat-row-meta-top {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+/* ===== Long-press context menu (chat row + message) =====
+   نفس شكل الـ .sidebar الموجود بالظبط (زجاجي، تحت الإصبع)، بس
+   بيتفتح في مكان الضغطة الطويلة مش تحت زرار التلت نقط */
+.ctx-menu-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 400;
+    background: rgba(0, 0, 0, 0);
+    pointer-events: none;
+    transition: background 0.28s ease;
+}
+
+.ctx-menu-overlay.open {
+    background: rgba(0, 0, 0, 0.32);
+    pointer-events: all;
+}
+
+.ctx-menu {
+    position: fixed;
+    width: 230px;
+    max-width: calc(100vw - 28px);
+    z-index: 410;
+    border-radius: 18px;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: scale(0.85);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.16s ease;
+    background: rgba(20, 26, 32, 0.86);
+    backdrop-filter: blur(18px) saturate(1.5);
+    -webkit-backdrop-filter: blur(18px) saturate(1.5);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.ctx-menu.open {
+    transform: scale(1);
+    opacity: 1;
+    pointer-events: all;
+}
+
+.ctx-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.ctx-menu-item:active,
+.ctx-menu-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.ctx-menu-item svg {
+    width: 19px;
+    height: 19px;
+    flex-shrink: 0;
+}
+
+.ctx-menu-item.danger {
+    color: #F87171;
+}
+
+/* ===== theme-white support for long-press context menu ===== */
+body.theme-white .ctx-menu {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+body.theme-white .ctx-menu-item {
+    color: var(--text);
+}
+
+body.theme-white .ctx-menu-item:active,
+body.theme-white .ctx-menu-item:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+body.theme-white .ctx-menu-item.danger {
+    color: #DC2626;
+}
+
+/* ===== Confirm sheet (delete chat / delete message) =====
+   نفس بار الـ .sheet-box بتاع باقي الأبب، بس أصغر ومخصص
+   لتأكيد إجراء بس (مش قايمة اختيارات طويلة) */
+.confirm-sheet-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.confirm-sheet-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: var(--radius-md);
+    border: none;
+    font-family: inherit;
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    text-align: center;
+}
+
+.confirm-sheet-btn:active {
+    transform: scale(0.97);
+}
+
+.confirm-sheet-btn.danger {
+    background: rgba(248, 113, 113, 0.14);
+    color: #F87171;
+    border: 1px solid rgba(248, 113, 113, 0.35);
+}
+
+.confirm-sheet-btn.neutral {
+    background: var(--glass-strong);
+    color: var(--text);
+    border: 1px solid var(--glass-border);
+}
+
+.confirm-sheet-btn.cancel {
+    background: transparent;
+    color: var(--text-dim);
+}
+
+/* ===== Reply preview (swipe-to-reply, WhatsApp-style) ===== */
+.msg-row {
+    position: relative;
+    touch-action: pan-y;
+}
+
+.msg-row-inner {
+    display: flex;
+    width: 100%;
+    transition: transform 0.18s ease;
+}
+
+.msg-row.from-me .msg-row-inner {
+    justify-content: flex-end;
+}
+
+.msg-row.from-them .msg-row-inner {
+    justify-content: flex-start;
+}
+
+.msg-row-reply-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%) scale(0.6);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--glass-strong);
+    border: 1px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dim);
+    opacity: 0;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    pointer-events: none;
+}
+
+.msg-row.swiping .msg-row-reply-icon {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+}
+
+html[dir="ltr"] .msg-row-reply-icon,
+.msg-row-reply-icon {
+    left: 8px;
+}
+
+.msg-row-reply-icon svg {
+    width: 15px;
+    height: 15px;
+}
+
+/* الرسالة المختارة (بعد الضغطة الطويلة) — من غير أي بوردر أو تظليل
+   حوالين الفقاعة، ومن غير ما يتحدد نص الرسالة نفسه (زي تحديد
+   Ctrl+A) وقت ما القايمة فاتحة */
+.msg-row.selected .bubble {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* ===== Quoted / replied-to snippet inside a bubble ===== */
+.bubble-reply-quote {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 6px 8px;
+    margin-bottom: 6px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.06);
+    border-inline-start: 3px solid var(--accent);
+    max-width: 100%;
+}
+
+.bubble-reply-quote-name {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.bubble-reply-quote-text {
+    font-size: 12px;
+    color: rgba(16, 22, 26, 0.65);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ===== Reply composer bar (above the textarea, before sending) ===== */
+.conv-reply-bar {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    margin: 0 10px 6px;
+    border-radius: 14px;
+    background: var(--glass-strong);
+    border: 1px solid var(--glass-border);
+    border-inline-start: 3px solid var(--accent);
+}
+
+.conv-reply-bar.open {
+    display: flex;
+}
+
+.conv-reply-bar-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.conv-reply-bar-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 1px;
+}
+
+.conv-reply-bar-preview {
+    font-size: 12.5px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.conv-reply-bar-close {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dim);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.conv-reply-bar-close:active {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* ===== Deleted message placeholder ===== */
+.bubble-text.deleted {
+    color: rgba(16, 22, 26, 0.45);
+    font-style: italic;
+}
+
+.bubble.bubble-left .bubble-text.deleted {
+    color: rgba(16, 22, 26, 0.45);
+}
+
+/* ===== Rename contact row inside Account Info sheet ===== */
+.account-info-rename-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.account-info-rename-input {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    background: var(--glass-strong);
+    border: 1px solid var(--glass-border);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.account-info-rename-input:focus {
+    border-color: var(--accent);
+}
+
+.account-info-rename-save {
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    border: none;
+    background: var(--grad);
+    color: #06110C;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.account-info-rename-save:active {
+    transform: scale(0.95);
+}
+
+.account-info-rename-save:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ===== Small toast (used for "renamed", "message deleted", etc) ===== */
+.cz-toast {
+    position: fixed;
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(20, 26, 32, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: var(--text);
+    padding: 11px 20px;
+    border-radius: 999px;
+    font-size: 13px;
+    backdrop-filter: blur(12px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    z-index: 500;
+    white-space: nowrap;
+    max-width: calc(100vw - 40px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cz-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ===== "يكتب الآن..." — نص الحالة تحت الاسم في البار العلوي ===== */
+.conv-status.conv-status-typing {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* ===== فقاعة "بيكتب الآن" المتحركة (3 نقط) داخل شاشة المحادثة ===== */
+.bubble-typing {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 16px;
+    min-width: 52px;
+    justify-content: center;
+}
+
+.typing-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(16, 22, 26, 0.45);
+    animation: cz-typing-bounce 1.2s infinite ease-in-out;
+}
+
+.bubble.bubble-left .typing-dot {
+    background: rgba(16, 22, 26, 0.45);
+}
+
+.typing-dot:nth-child(1) { animation-delay: 0s; }
+.typing-dot:nth-child(2) { animation-delay: 0.15s; }
+.typing-dot:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes cz-typing-bounce {
+    0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 0.5;
+    }
+    30% {
+        transform: translateY(-4px);
+        opacity: 1;
+    }
+}
+
+/* ===== نقطة "بيكتب" جنب اسم الشات في قائمة الدردشات الرئيسية ===== */
+.chat-row-typing-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+    animation: cz-typing-pulse 1.4s infinite ease-in-out;
+}
+
+@keyframes cz-typing-pulse {
+    0%, 100% { opacity: 0.4; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1); }
+}
+
+.chat-row-preview.chat-row-preview-typing {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* ===== صح آخر رسالة (رمادي/أزرق) جنب معاينة الشات في القايمة
+   الرئيسية — نفس أيقونات iOS بتاعة جوه الشات بالظبط، بس أصغر ===== */
+.chat-row-tick {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-inline-end: 4px;
+    flex-shrink: 0;
+}
+
+.chat-row-tick.tick-unsent {
+    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 74 58'><path d='M 23.50 43.11 C18.79,41.06 17.50,38.22 17.50,29.92 C17.50,22.65 17.71,21.83 20.27,19.27 C22.84,16.71 23.64,16.50 31.00,16.50 C38.36,16.50 39.16,16.71 41.73,19.27 C44.29,21.84 44.50,22.64 44.50,30.00 C44.50,37.34 44.29,38.17 41.76,40.69 C39.39,43.06 38.10,43.47 32.26,43.71 C28.54,43.86 24.60,43.59 23.50,43.11 ZM 39.17 38.35 C41.67,36.09 41.79,24.53 39.35,21.83 C37.09,19.33 25.53,19.21 22.83,21.65 C20.33,23.91 20.21,35.47 22.65,38.17 C24.91,40.67 36.47,40.79 39.17,38.35 ZM 29.00 28.00 C29.00,24.22 29.37,23.00 30.50,23.00 C31.55,23.00 32.00,24.06 32.00,26.50 C32.00,29.57 32.31,30.00 34.50,30.00 C36.06,30.00 37.00,30.57 37.00,31.50 C37.00,32.58 35.89,33.00 33.00,33.00 L 29.00 33.00 L 29.00 28.00 Z' fill='black'/></svg>");
+    mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 74 58'><path d='M 23.50 43.11 C18.79,41.06 17.50,38.22 17.50,29.92 C17.50,22.65 17.71,21.83 20.27,19.27 C22.84,16.71 23.64,16.50 31.00,16.50 C38.36,16.50 39.16,16.71 41.73,19.27 C44.29,21.84 44.50,22.64 44.50,30.00 C44.50,37.34 44.29,38.17 41.76,40.69 C39.39,43.06 38.10,43.47 32.26,43.71 C28.54,43.86 24.60,43.59 23.50,43.11 ZM 39.17 38.35 C41.67,36.09 41.79,24.53 39.35,21.83 C37.09,19.33 25.53,19.21 22.83,21.65 C20.33,23.91 20.21,35.47 22.65,38.17 C24.91,40.67 36.47,40.79 39.17,38.35 ZM 29.00 28.00 C29.00,24.22 29.37,23.00 30.50,23.00 C31.55,23.00 32.00,24.06 32.00,26.50 C32.00,29.57 32.31,30.00 34.50,30.00 C36.06,30.00 37.00,30.57 37.00,31.50 C37.00,32.58 35.89,33.00 33.00,33.00 L 29.00 33.00 L 29.00 28.00 Z' fill='black'/></svg>");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    background-color: var(--text-faint);
+    width: 14.4px;
+    height: 14.4px;
+}
+
+.chat-row-tick.tick-offline {
+    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 74 58'><path d='M 19.40 38.70 C14.20,33.86 13.70,33.06 14.93,31.58 C16.20,30.05 16.63,30.21 19.95,33.45 C21.95,35.40 24.06,37.00 24.65,37.00 C25.23,37.00 29.38,32.30 33.87,26.55 C38.35,20.81 42.42,15.86 42.90,15.56 C43.38,15.27 44.29,15.64 44.91,16.39 C45.81,17.48 44.02,20.36 36.39,30.13 C31.07,36.93 26.39,42.87 25.99,43.32 C25.58,43.78 22.62,41.70 19.40,38.70 Z' fill='black'/></svg>");
+    mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 74 58'><path d='M 19.40 38.70 C14.20,33.86 13.70,33.06 14.93,31.58 C16.20,30.05 16.63,30.21 19.95,33.45 C21.95,35.40 24.06,37.00 24.65,37.00 C25.23,37.00 29.38,32.30 33.87,26.55 C38.35,20.81 42.42,15.86 42.90,15.56 C43.38,15.27 44.29,15.64 44.91,16.39 C45.81,17.48 44.02,20.36 36.39,30.13 C31.07,36.93 26.39,42.87 25.99,43.32 C25.58,43.78 22.62,41.70 19.40,38.70 Z' fill='black'/></svg>");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    background-color: var(--text-faint);
+    width: 17.0px;
+    height: 13.1px;
+}
+
+.chat-row-tick.tick-unread,
+.chat-row-tick.tick-read {
+    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 74 58'><path d='M 19.40 38.70 C14.20,33.86 13.70,33.06 14.93,31.58 C16.20,30.05 16.63,30.21 19.95,33.45 C21.95,35.40 24.06,37.00 24.65,37.00 C25.23,37.00 29.38,32.30 33.87,26.55 C38.35,20.81 42.42,15.86 42.90,15.56 C43.38,15.27 44.29,15.64 44.92,16.40 C45.82,17.49 44.05,20.34 36.41,30.14 C31.10,36.94 26.42,42.87 26.01,43.32 C25.59,43.78 22.62,41.70 19.40,38.70 ZM 35.07 41.57 C32.23,38.55 32.89,35.68 36.23,36.52 C38.19,37.01 39.69,35.55 47.00,26.05 C51.68,19.98 55.78,15.00 56.13,15.00 C56.47,15.00 57.24,15.58 57.83,16.29 C58.64,17.27 56.46,20.73 48.87,30.54 C43.35,37.67 38.51,43.62 38.11,43.77 C37.71,43.92 36.34,42.93 35.07,41.57 Z' fill='black'/></svg>");
+    mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 74 58'><path d='M 19.40 38.70 C14.20,33.86 13.70,33.06 14.93,31.58 C16.20,30.05 16.63,30.21 19.95,33.45 C21.95,35.40 24.06,37.00 24.65,37.00 C25.23,37.00 29.38,32.30 33.87,26.55 C38.35,20.81 42.42,15.86 42.90,15.56 C43.38,15.27 44.29,15.64 44.92,16.40 C45.82,17.49 44.05,20.34 36.41,30.14 C31.10,36.94 26.42,42.87 26.01,43.32 C25.59,43.78 22.62,41.70 19.40,38.70 ZM 35.07 41.57 C32.23,38.55 32.89,35.68 36.23,36.52 C38.19,37.01 39.69,35.55 47.00,26.05 C51.68,19.98 55.78,15.00 56.13,15.00 C56.47,15.00 57.24,15.58 57.83,16.29 C58.64,17.27 56.46,20.73 48.87,30.54 C43.35,37.67 38.51,43.62 38.11,43.77 C37.71,43.92 36.34,42.93 35.07,41.57 Z' fill='black'/></svg>");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    width: 18.4px;
+    height: 14.4px;
+}
+
+.chat-row-tick.tick-unread {
+    background-color: var(--text-faint);
+}
+
+.chat-row-tick.tick-read {
+    background-color: #4FA3FF;
+}
+
+/* ===== تنبيه "نتك ضعيف" — يظهر في نص الشاشة، زجاجي، ويختفي
+   لوحده بعد كام ثانية ===== */
+.cz-weak-conn-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.cz-weak-conn-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 24px;
+    border-radius: 18px;
+    background: rgba(20, 26, 32, 0.88);
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    color: #F87171;
+    font-size: 14.5px;
+    font-weight: 700;
+    transform: scale(0.85);
+    opacity: 0;
+    transition: transform 0.25s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.2s ease;
+}
+
+.cz-weak-conn-overlay.show .cz-weak-conn-box {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.cz-weak-conn-box svg {
+    flex-shrink: 0;
+}
+
+/* ===================================================
+   ChatZone Ai — دايرة عايمة (Floating Action Button)
+   ثابتة في ركن شاشة الشاتس، بتفتح ai-chat.html بالضغط عليها
+=================================================== */
+.chatzone-ai-fab {
+    position: fixed;
+    /* افتراضيًا (LTR / إنجليزي): يمين الشاشة. في RTL / عربي بتتقلب
+       لشمال الشاشة عن طريق القاعدة تحت. مفيش أي أنيميشن نبض أو موج
+       هنا خالص — دايرة زجاجية ثابتة بس */
+    right: 18px;
+    left: auto;
+    bottom: 96px; /* فوق شريط التنقل السفلي */
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    padding: 0;
+    background: rgba(20, 26, 32, 0.55);
+    backdrop-filter: blur(18px) saturate(1.5);
+    -webkit-backdrop-filter: blur(18px) saturate(1.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    cursor: pointer;
+    z-index: 40;
+    transition: transform 0.15s ease;
+}
+
+.chatzone-ai-fab:active {
+    transform: scale(0.92);
+}
+
+.chatzone-ai-fab-img {
+    width: 68%;
+    height: 68%;
+    object-fit: contain;
+}
+
+body.theme-white .chatzone-ai-fab {
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* في وضع RTL (عربي) الأيقونة العايمة تتقلب لشمال الشاشة، عكس
+   وضعها الافتراضي في LTR (إنجليزي) اللي بيكون يمين الشاشة */
+html[dir="rtl"] .chatzone-ai-fab {
+    left: 18px;
+    right: auto;
+}

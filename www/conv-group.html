@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>ChatZone — الجروب</title>
+<script>
+    if (!localStorage.getItem('cz_verified_email')) {
+        window.location.replace('index.html');
+    }
+</script>
+<script>
+    // تطبيق فوري للون خلفية الشات المحفوظ لنفس الجروب ده (قبل أي
+    // رسم) — نفس فكرة conversation.html بالظبط.
+    (function () {
+        try {
+            var params = new URLSearchParams(window.location.search);
+            var candidates = ['id', 'uid', 'chatId', 'conversationId', 'convId', 'groupId', 'gid', 'cid'];
+            var convKey = 'default';
+            for (var i = 0; i < candidates.length; i++) {
+                var v = params.get(candidates[i]);
+                if (v) { convKey = v; break; }
+            }
+            var hex = localStorage.getItem('cz_chat_bg_color__' + convKey);
+            if (hex) {
+                var style = document.createElement('style');
+                style.id = 'earlyChatBgStyle';
+                style.textContent = '#convMessages{background:' + hex + ' !important;}';
+                document.head.appendChild(style);
+            }
+        } catch (e) {}
+    })();
+</script>
+<script src="global-chat-bg.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Tajawal:wght@400;500;700&family=Amiri:wght@400;700&family=Reem+Kufi:wght@400;600&family=Lobster&family=Pacifico&family=Dancing+Script:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="main.css">
+<link rel="stylesheet" href="settings.css">
+<link rel="stylesheet" href="conversation.css">
+<link rel="stylesheet" href="chatzone-extra.css">
+<link rel="stylesheet" href="conv-group.css">
+<link rel="stylesheet" href="enhancements.css">
+</head>
+<body>
+
+    <div class="conv-shell">
+
+        <!-- ===== Top Bar: زرار الرجوع أقصى اليسار + اسم الجروب في المنتصف ===== -->
+        <header class="conv-topbar" id="convTopbarNormal">
+            <button class="conv-back-btn" id="convBackBtn" aria-label="رجوع">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+
+            <div class="conv-identity" id="convIdentity">
+                <div class="conv-avatar" id="convAvatar">
+                    <span class="group-avatar-initial" id="groupAvatarInitial">؟</span>
+                </div>
+                <div class="conv-identity-text">
+                    <h1 class="conv-name" id="convName">—</h1>
+                    <p class="conv-status" id="convStatus"></p>
+                </div>
+            </div>
+
+            <button class="conv-menu-btn" id="convMenuBtn" aria-label="خيارات">
+                <span class="dots">
+                    <span></span><span></span><span></span>
+                </span>
+            </button>
+        </header>
+
+        <!-- ===== Top Bar: وضع التحديد المتعدد ===== -->
+        <header class="conv-topbar conv-topbar-select" id="convTopbarSelect">
+            <button class="conv-back-btn" id="convSelectCancelBtn" aria-label="إلغاء">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+
+            <div class="conv-select-count" id="convSelectCount">0</div>
+
+            <button class="conv-select-delete-btn" id="convSelectDeleteBtn" aria-label="حذف المحدد">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>
+            </button>
+        </header>
+
+        <!-- ===== منطقة الرسائل ===== -->
+        <div class="conv-messages" id="convMessages">
+            <!-- الرسايل بتتحط هنا ديناميكياً من conv-group.js -->
+        </div>
+
+        <!-- ===== بار الكتابة السفلي: عادي أو عايم (Liquid Glass) ===== -->
+        <div class="conv-input-area" id="convInputArea">
+            <div class="conv-reply-bar" id="convReplyBar">
+                <div class="conv-reply-bar-text">
+                    <div class="conv-reply-bar-name" id="convReplyBarName">—</div>
+                    <div class="conv-reply-bar-preview" id="convReplyBarPreview">—</div>
+                </div>
+                <div class="conv-reply-bar-close" id="convReplyBarClose" aria-label="إلغاء الرد">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </div>
+            </div>
+            <div class="conv-input-bar" id="convInputBar">
+                <textarea
+                    class="conv-textarea"
+                    id="convTextarea"
+                    rows="1"
+                    data-i18n-placeholder="type_message"
+                    placeholder="اكتب رسالة..."
+                ></textarea>
+                <button class="conv-send-btn" id="convSendBtn" aria-label="إرسال">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== Group 3-dot Dropdown Menu ===== -->
+    <div class="sidebar-overlay" id="convSidebarOverlay"></div>
+    <div class="sidebar" id="convSidebarMenu">
+        <div class="sidebar-item" id="convOpenBubbleColors">
+            <div class="sidebar-item-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 21c-4.97 0-9-3.5-9-8a8 8 0 0 1 16 0c0 1.5-1 2.5-2.5 2.5H15a1.5 1.5 0 0 0-1 2.6c.4.4.6.9.6 1.4 0 1.4-1.2 1.5-2.6 1.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="7.5" cy="11" r="1.2" fill="currentColor"/>
+                    <circle cx="12" cy="8" r="1.2" fill="currentColor"/>
+                    <circle cx="16" cy="11" r="1.2" fill="currentColor"/>
+                </svg>
+            </div>
+            <div class="sidebar-item-text">
+                <h4 data-i18n="conv_menu_bubbles">تخصيص لون الفقاعات</h4>
+                <p data-i18n="conv_menu_bubbles_sub">لون فقاعتك بيفضل معاك في كل شاتاتك</p>
+            </div>
+        </div>
+        <div class="sidebar-item" id="convOpenFont">
+            <div class="sidebar-item-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>
+            </div>
+            <div class="sidebar-item-text">
+                <h4 data-i18n="conv_menu_font">تخصيص الخط</h4>
+                <p data-i18n="conv_menu_font_sub">اختر خط الكتابة في الشات</p>
+            </div>
+        </div>
+        <div class="sidebar-item" id="convOpenInfo">
+            <div class="sidebar-item-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="sidebar-item-text">
+                <h4 data-i18n="conv_menu_group_members">أعضاء الجروب</h4>
+                <p data-i18n="conv_menu_group_members_sub">شوف كل الأعضاء في الجروب ده</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Bubble Colors Sheet ===== -->
+    <div class="sheet-overlay" id="sheet-bubble-colors">
+        <div class="sheet-box">
+            <div class="sheet-grabber"></div>
+            <div class="sheet-close" data-close-sheet="sheet-bubble-colors">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="sheet-title" data-i18n="bubbles_title">تخصيص لون الفقاعات</div>
+            <div class="sheet-sub" data-i18n="bubbles_body_group">لون فقاعتك بيفضل معاك في كل الشاتات والجروبات اللي ليك.</div>
+
+            <!-- معاينة حية ثابتة -->
+            <div class="bubble-preview-box">
+                <div class="bubble-preview-row left">
+                    <div class="bubble bubble-left bubble-preview" id="bubblePreviewTheirs">
+                        <div class="bubble-text" data-i18n="bubbles_preview_hi">أهلا</div>
+                    </div>
+                </div>
+                <div class="bubble-preview-row right">
+                    <div class="bubble bubble-right bubble-preview" id="bubblePreviewMine">
+                        <div class="bubble-text" data-i18n="bubbles_preview_hi_reply">أهلا وسهلا</div>
+                        <div class="bubble-meta">
+                            <span class="bubble-time">12:30</span>
+                            <span class="bubble-tick tick-read" id="bubblePreviewTick"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bubble-preview-credit">Moded by Mohamed Ashraf</div>
+            </div>
+
+            <div class="bubble-option-list">
+                <div class="bubble-option-row" id="bubbleOptionMine">
+                    <div class="bubble-option-swatch" id="bubbleOptionMineSwatch" style="background:#FFFFFF;"></div>
+                    <span data-i18n="bubbles_mine_title">لون فقاعتي</span>
+                    <svg class="bubble-option-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+                <div class="bubble-option-row" id="bubbleOptionTick">
+                    <div class="bubble-option-swatch" id="bubbleOptionTickSwatch" style="background:#4FA3FF;"></div>
+                    <span data-i18n="bubbles_tick_title">لون الصح الزرقاء</span>
+                    <svg class="bubble-option-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+                <div class="bubble-option-row" id="bubbleOptionBg">
+                    <div class="bubble-option-swatch" id="bubbleOptionBgSwatch" style="background:transparent;"></div>
+                    <span>Background color</span>
+                    <svg class="bubble-option-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+            </div>
+
+            <button class="bubble-reset-btn" id="bubbleResetBtn" data-i18n="bubbles_reset">إرجاع الافتراضي</button>
+        </div>
+    </div>
+
+    <!-- ===== Sheet: اختيار لون عام (خلفية الشات) — يستخدمه enhancements.js فقط ===== -->
+    <div class="sheet-overlay" id="sheet-pick-app-color">
+        <div class="sheet-box sheet-box-small">
+            <div class="sheet-grabber"></div>
+            <div class="sheet-close" data-close-sheet="sheet-pick-app-color">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="sheet-title" id="pickAppColorTitle">اختر لون</div>
+
+            <div class="app-color-preset-grid" id="appColorPresetGrid"></div>
+
+            <div class="choose-color-item" id="appColorCustomBtn">
+                <div class="choose-color-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.4-1.1-.2-.3-.4-.6-.4-1 0-.8.7-1.5 1.5-1.5H16c3.3 0 6-2.7 6-6 0-4.4-4-8-10-8z"/></svg>
+                </div>
+                <span>لون مخصص (اختر أي لون)</span>
+                <svg class="bubble-option-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+
+            <button class="bubble-reset-btn" id="appColorResetBtn">إرجاع الافتراضي</button>
+
+            <input type="color" id="appColorNativePicker" class="visually-hidden-color-input">
+        </div>
+    </div>
+
+    <!-- ===== "اختر لون" Sheet (bottom) ===== -->
+    <div class="sheet-overlay" id="sheet-choose-color">
+        <div class="sheet-box sheet-box-small">
+            <div class="sheet-grabber"></div>
+            <div class="sheet-close" data-close-sheet="sheet-choose-color">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="sheet-title" id="chooseColorTitle" data-i18n="choose_color_title">اختر لون</div>
+
+            <div class="choose-color-list">
+                <div class="choose-color-item" id="openColorEditorBtn">
+                    <div class="choose-color-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.4-1.1-.2-.3-.4-.6-.4-1 0-.8.7-1.5 1.5-1.5H16c3.3 0 6-2.7 6-6 0-4.4-4-8-10-8z"/></svg>
+                    </div>
+                    <span data-i18n="choose_color_custom">محرر الألوان (اختر أي لون)</span>
+                    <svg class="bubble-option-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+                <div class="choose-color-item" id="openColorPresetsBtn">
+                    <div class="choose-color-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+                    </div>
+                    <span data-i18n="choose_color_presets">ألوان الفقاعات الخاصة بالتطبيق</span>
+                    <svg class="bubble-option-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+            </div>
+
+            <input type="color" id="bubbleColorNativePicker" class="visually-hidden-color-input">
+        </div>
+    </div>
+
+    <!-- ===== Presets Modal ===== -->
+    <div class="sheet-overlay center-modal-overlay" id="sheet-color-presets">
+        <div class="center-modal-box">
+            <div class="sheet-title" data-i18n="choose_color_presets_title">ألوان الفقاعات الخاصة بالتطبيق</div>
+            <div class="preset-square-grid" id="presetSquareGrid">
+                <div class="preset-square-option" data-color="#FFFFFF" data-text-dark="1">
+                    <div class="preset-square" style="background:#FFFFFF; border-color: rgba(0,0,0,0.15);"></div>
+                    <span data-i18n="bubbles_default">افتراضي</span>
+                </div>
+                <div class="preset-square-option" data-color="#C9CDD3" data-text-dark="1">
+                    <div class="preset-square" style="background:#C9CDD3;"></div>
+                    <span data-i18n="bubbles_silver">فضي</span>
+                </div>
+                <div class="preset-square-option" data-color="#25D9A0" data-text-dark="1">
+                    <div class="preset-square" style="background:#25D9A0;"></div>
+                    <span data-i18n="bubbles_green">أخضر</span>
+                </div>
+                <div class="preset-square-option" data-color="#5B7FFF" data-text-dark="0">
+                    <div class="preset-square" style="background:#5B7FFF;"></div>
+                    <span data-i18n="bubbles_blue">أزرق</span>
+                </div>
+                <div class="preset-square-option" data-color="#ec4899" data-text-dark="0">
+                    <div class="preset-square" style="background:#ec4899;"></div>
+                    <span data-i18n="bubbles_pink">وردي</span>
+                </div>
+                <div class="preset-square-option" data-color="#a78bfa" data-text-dark="0">
+                    <div class="preset-square" style="background:#a78bfa;"></div>
+                    <span data-i18n="bubbles_purple">بنفسجي</span>
+                </div>
+                <div class="preset-square-option" data-color="#f59e0b" data-text-dark="1">
+                    <div class="preset-square" style="background:#f59e0b;"></div>
+                    <span data-i18n="bubbles_orange">برتقالي</span>
+                </div>
+                <div class="preset-square-option" data-color="#06b6d4" data-text-dark="0">
+                    <div class="preset-square" style="background:#06b6d4;"></div>
+                    <span data-i18n="bubbles_cyan">سماوي</span>
+                </div>
+                <div class="preset-square-option" data-color="#ef4444" data-text-dark="0">
+                    <div class="preset-square" style="background:#ef4444;"></div>
+                    <span data-i18n="bubbles_red">أحمر</span>
+                </div>
+                <div class="preset-square-option" data-color="#1a1a2e" data-text-dark="0">
+                    <div class="preset-square" style="background:#1a1a2e; border-color: rgba(255,255,255,0.2);"></div>
+                    <span data-i18n="bubbles_dark">داكن</span>
+                </div>
+            </div>
+            <div class="center-modal-actions">
+                <button class="color-cancel-btn" id="presetsCancelBtn" data-i18n="color_cancel">إلغاء</button>
+                <button class="color-save-btn" id="presetsSaveBtn" data-i18n="color_save">حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Save confirmation for the native color editor ===== -->
+    <div class="sheet-overlay center-modal-overlay" id="sheet-color-editor-confirm">
+        <div class="center-modal-box small">
+            <div class="color-editor-preview" id="colorEditorPreviewSwatch"></div>
+            <div class="sheet-title" data-i18n="choose_color_editor_title">اختر لون</div>
+            <div class="sheet-sub" data-i18n="choose_color_editor_sub">دوس حفظ عشان اللون يتطبق، أو إلغاء عشان ترجع من غير أي تغيير.</div>
+            <div class="center-modal-actions">
+                <button class="color-cancel-btn" id="editorCancelBtn" data-i18n="color_cancel">إلغاء</button>
+                <button class="color-save-btn" id="editorSaveBtn" data-i18n="color_save">حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Unsaved-changes guard ===== -->
+    <div class="sheet-overlay center-modal-overlay" id="sheet-unsaved-guard">
+        <div class="center-modal-box small">
+            <div class="sheet-title" data-i18n="unsaved_guard_title">تحفظ اللون الأول؟</div>
+            <div class="sheet-sub" data-i18n="unsaved_guard_sub">عندك لون مختار لسه ما اتحفظش. لو خرجت دلوقتي هيتلغي.</div>
+            <div class="center-modal-actions">
+                <button class="color-cancel-btn" id="unsavedDiscardBtn" data-i18n="unsaved_guard_discard">إلغاء</button>
+                <button class="color-save-btn" id="unsavedSaveBtn" data-i18n="color_save">حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Font Sheet ===== -->
+    <div class="sheet-overlay" id="sheet-font">
+        <div class="sheet-box">
+            <div class="sheet-grabber"></div>
+            <div class="sheet-close" data-close-sheet="sheet-font">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="sheet-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>
+            </div>
+            <div class="sheet-title" data-i18n="font_title">تخصيص الخط</div>
+            <div class="sheet-sub" data-i18n="font_body">اختر خط الكتابة في الشات، وسيتم حفظه واستخدامه دايمًا في كل المحادثات.</div>
+
+            <div class="font-option-list" id="fontOptionList">
+                <div class="font-option selected" data-font="default">
+                    <span class="font-option-preview font-preview-default">Aa أب</span>
+                    <span class="font-option-label" data-i18n="font_default">الافتراضي</span>
+                    <div class="font-option-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                </div>
+                <div class="font-option" data-font="cairo">
+                    <span class="font-option-preview font-preview-cairo">Aa أب</span>
+                    <span class="font-option-label">Cairo</span>
+                    <div class="font-option-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                </div>
+                <div class="font-option" data-font="tajawal">
+                    <span class="font-option-preview font-preview-tajawal">Aa أب</span>
+                    <span class="font-option-label">Tajawal</span>
+                    <div class="font-option-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                </div>
+                <div class="font-option" data-font="amiri">
+                    <span class="font-option-preview font-preview-amiri">Aa أب</span>
+                    <span class="font-option-label">Amiri <span data-i18n="font_deco_ar">(خط زخرفي عربي)</span></span>
+                    <div class="font-option-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                </div>
+                <div class="font-option" data-font="reem">
+                    <span class="font-option-preview font-preview-reem">Aa أب</span>
+                    <span class="font-option-label">Reem Kufi <span data-i18n="font_deco_ar">(خط زخرفي عربي)</span></span>
+                    <div class="font-option-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                </div>
+                <div class="font-option" data-font="lobster">
+                    <span class="font-option-preview font-preview-lobster">Aa</span>
+                    <span class="font-option-label">Lobster <span data-i18n="font_deco_en">(خط زخرفي إنجليزي)</span></span>
+                    <div class="font-option-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                </div>
+                <div class="font-option" data-font="pacifico">
+                    <span class="font-option-preview font-preview-pacifico">Aa</span>
+                    <span class="font-option-label">Pacifico <span data-i18n="font_deco_en">(خط زخرفي إنجليزي)</span></span>
+                    <div class="font-option-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                </div>
+                <div class="font-option" data-font="dancing">
+                    <span class="font-option-preview font-preview-dancing">Aa</span>
+                    <span class="font-option-label">Dancing Script <span data-i18n="font_deco_en">(خط زخرفي إنجليزي)</span></span>
+                    <div class="font-option-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Message long-press context menu ===== -->
+    <div class="ctx-menu-overlay" id="msgCtxOverlay"></div>
+    <div class="ctx-menu" id="msgCtxMenu">
+        <div class="ctx-menu-item" id="msgCtxReply">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 17 4 12 9 7"></polyline><path d="M20 18v-2a4 4 0 0 0-4-4H4"></path></svg>
+            <span data-i18n="ctx_reply">رد</span>
+        </div>
+        <div class="ctx-menu-item" id="msgCtxCopy">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span data-i18n="ctx_copy">نسخ</span>
+        </div>
+        <div class="ctx-menu-item" id="msgCtxSelect">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+            <span data-i18n="ctx_select">تحديد</span>
+        </div>
+        <div class="ctx-menu-item danger" id="msgCtxDelete">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>
+            <span data-i18n="ctx_delete_msg">حذف الرسالة</span>
+        </div>
+    </div>
+
+    <!-- ===== Delete message confirm sheet ===== -->
+    <div class="sheet-overlay" id="sheet-delete-msg">
+        <div class="sheet-box">
+            <div class="sheet-grabber"></div>
+            <div class="sheet-close" data-close-sheet="sheet-delete-msg">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="sheet-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path></svg>
+            </div>
+            <div class="sheet-title" data-i18n="delete_msg_title">حذف الرسالة؟</div>
+            <div class="sheet-sub" id="deleteMsgSheetBody" data-i18n="delete_msg_body_mine">تقدر تحذفها من عندك بس، أو من عند الجميع.</div>
+            <div class="confirm-sheet-actions">
+                <button class="confirm-sheet-btn danger" id="deleteMsgForEveryoneBtn" data-i18n="ctx_delete_everyone_group">حذف من عند الجميع</button>
+                <button class="confirm-sheet-btn neutral" id="deleteMsgForMeBtn" data-i18n="ctx_delete_me">حذف من عندي بس</button>
+                <button class="confirm-sheet-btn cancel" data-close-sheet="sheet-delete-msg" data-i18n="btn_cancel">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Delete selected messages confirm sheet ===== -->
+    <div class="sheet-overlay" id="sheet-delete-selected">
+        <div class="sheet-box">
+            <div class="sheet-grabber"></div>
+            <div class="sheet-close" data-close-sheet="sheet-delete-selected">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="sheet-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path></svg>
+            </div>
+            <div class="sheet-title" id="deleteSelectedSheetTitle" data-i18n="delete_selected_title">حذف الرسائل المحددة؟</div>
+            <div class="sheet-sub" id="deleteSelectedSheetBody" data-i18n="delete_selected_body_group">رسائلك هتتحذف نهائيًا من عند الجميع، ورسائل الأعضاء التانيين هتتخفي من عندك بس.</div>
+            <div class="confirm-sheet-actions">
+                <button class="confirm-sheet-btn danger" id="deleteSelectedConfirmBtn" data-i18n="btn_delete">حذف</button>
+                <button class="confirm-sheet-btn cancel" data-close-sheet="sheet-delete-selected" data-i18n="btn_cancel">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Group Info Sheet (اسم/صورة الجروب + قائمة الأعضاء) ===== -->
+    <div class="sheet-overlay" id="sheet-account-info">
+        <div class="sheet-box sheet-box-group-info">
+            <div class="sheet-grabber"></div>
+            <div class="sheet-close" data-close-sheet="sheet-account-info">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="account-info-avatar" id="accountInfoAvatar">
+                <span class="group-avatar-initial group-avatar-initial-lg" id="groupInfoAvatarInitial">؟</span>
+            </div>
+            <div class="sheet-title" id="accountInfoName">—</div>
+            <div class="account-info-email" id="groupInfoMemberCount">—</div>
+
+            <div class="group-members-scroll" id="groupMembersScroll">
+                <!-- بيتحط ديناميكياً من conv-group.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Fullscreen photo viewer ===== -->
+    <div class="photo-viewer-overlay" id="photoViewerOverlay">
+        <button class="photo-viewer-close" id="photoViewerClose" aria-label="إغلاق">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <img class="photo-viewer-img" id="photoViewerImg" src="" alt="">
+    </div>
+
+    <script type="module" src="conv-group.js"></script>
+    <script type="module" src="enhancements.js"></script>
+    <script src="backnav.js"></script>
+</body>
+</html>

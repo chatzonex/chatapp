@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<script src="lang-flash-guard.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>ChatZone — الدردشة</title>
+<script>
+    if (!localStorage.getItem('cz_verified_email')) {
+        window.location.replace('index.html');
+    }
+</script>
+<script>
+    (function () {
+        try {
+            var theme = localStorage.getItem('cz_theme') || 'dark';
+            var lang = localStorage.getItem('cz_lang') || 'ar';
+            var html = document.documentElement;
+            html.lang = lang;
+            html.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+
+            var chatGlass = localStorage.getItem('cz_lg_chat') === 'on';
+            if (chatGlass) html.classList.add('lg-chat-on');
+
+            var moveToBody = function () {
+                if (!document.body) return;
+                if (theme === 'white') document.body.classList.add('theme-white');
+                if (chatGlass) document.body.classList.add('lg-chat-on');
+            };
+            if (document.body) {
+                moveToBody();
+            } else {
+                new MutationObserver(function (_, obs) {
+                    if (document.body) { moveToBody(); obs.disconnect(); }
+                }).observe(document.documentElement, { childList: true });
+            }
+        } catch (e) {}
+    })();
+</script>
+<link rel="stylesheet" href="main.css">
+<link rel="stylesheet" href="settings.css">
+<link rel="stylesheet" href="conversation.css">
+<link rel="stylesheet" href="chatzone-extra.css">
+<link rel="stylesheet" href="enhancements.css">
+<link rel="stylesheet" href="subpages.css">
+</head>
+<body>
+
+    <div class="subpage-shell">
+
+        <header class="subpage-topbar">
+            <button class="subpage-back-btn" id="subpageBackBtn" aria-label="رجوع">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+            <h1 class="subpage-title" data-i18n="chat_row">الدردشة</h1>
+        </header>
+
+        <div class="subpage-scroll">
+
+            <p class="subpage-desc" data-i18n="lg_chat_body">فعّل الزجاج السائل على بار الاسم وزرار الرجوع وبار الكتابة في شاشة الدردشة.</p>
+
+            <div class="lg-toggle-row">
+                <div class="lg-toggle-text">
+                    <h5 data-i18n="lg_chat_toggle_title">الزجاج السائل في الدردشة</h5>
+                    <p data-i18n="lg_chat_sub">بار الاسم، زرار الرجوع، وبار الكتابة</p>
+                </div>
+                <label class="ios-switch">
+                    <input type="checkbox" id="lgSwitch-bottombar-chat">
+                    <span class="ios-switch-track"><span class="ios-switch-thumb"></span></span>
+                </label>
+            </div>
+
+            <!-- ===== إخفاء صورة البروفايل — منقولة من الخصوصية ===== -->
+            <div class="lg-toggle-row">
+                <div class="lg-toggle-text">
+                    <h5 data-i18n="privacy_hide_photo_title">إخفاء صورة البروفايل عن الآخرين</h5>
+                    <p data-i18n="privacy_hide_photo_sub">اللي بتتكلم معاهم مش هيشوفوا صورة البروفايل بتاعتك</p>
+                </div>
+                <label class="ios-switch">
+                    <input type="checkbox" id="privacySwitch-hidePhotoFromOthers">
+                    <span class="ios-switch-track"><span class="ios-switch-thumb"></span></span>
+                </label>
+            </div>
+
+            <!-- ===== Background color — لون خلفية الشات، بيتطبق على كل الشتات ===== -->
+            <div class="subpage-group-label" data-i18n="chat_bg_group_label">مظهر الشات</div>
+
+            <div class="theme-color-row" id="globalChatBgColorRow" style="margin-top:2px;">
+                <div class="theme-color-swatch" id="globalChatBgColorSwatch"></div>
+                <span class="theme-color-label" data-i18n="chat_bg_color_pick">لون خلفية الشات</span>
+                <span class="theme-color-hex" id="globalChatBgColorHex"></span>
+            </div>
+            <p class="chatbg-preview-note" data-i18n="chat_bg_color_note">هيتطبق اللون ده على خلفية كل الشتات والجروبات.</p>
+
+        </div>
+
+    </div>
+
+    <!-- ===== شيت اختيار اللون العام (بنفس تصميم HomeSettings)، بيستخدمه chatsettings-bg.js ===== -->
+    <div class="sheet-overlay" id="sheet-pick-app-color">
+        <div class="sheet-box sheet-box-small">
+            <div class="sheet-grabber"></div>
+            <div class="sheet-close" data-close-sheet="sheet-pick-app-color">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="sheet-title" id="pickAppColorTitle">اختر لون</div>
+
+            <div class="app-color-preset-grid" id="appColorPresetGrid"></div>
+
+            <div class="choose-color-item" id="appColorCustomBtn">
+                <div class="choose-color-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.4-1.1-.2-.3-.4-.6-.4-1 0-.8.7-1.5 1.5-1.5H16c3.3 0 6-2.7 6-6 0-4.4-4-8-10-8z"/></svg>
+                </div>
+                <span data-i18n="custom_color_option">لون مخصص (اختر أي لون)</span>
+                <svg class="bubble-option-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+
+            <button class="bubble-reset-btn" id="appColorResetBtn" data-i18n="reset_default">إرجاع الافتراضي</button>
+
+            <input type="color" id="appColorNativePicker" class="visually-hidden-color-input">
+        </div>
+    </div>
+
+    <script type="module" src="settings.js"></script>
+    <script src="chatsettings-bg.js"></script>
+    <script src="backnav.js"></script>
+    <script src="subpages-nav.js"></script>
+</body>
+</html>

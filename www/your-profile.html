@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>ChatZone — البروفايل الشخصي</title>
+<script>
+    if (!localStorage.getItem('cz_verified_email')) {
+        window.location.replace('index.html');
+    }
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="main.css">
+<link rel="stylesheet" href="settings.css">
+<link rel="stylesheet" href="your-profile.css">
+</head>
+<body>
+
+    <div class="yp-shell">
+
+        <header class="topbar topbar-simple">
+            <button class="yp-back-btn" id="ypBackBtn" aria-label="رجوع">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+            <h1 class="topbar-title" id="ypTitle" style="text-align:center;">البروفايل الشخصي</h1>
+            <span class="yp-back-btn-spacer"></span>
+        </header>
+
+        <div class="yp-scroll">
+
+            <!-- ===== صورة البروفايل في منتصف الشاشة ===== -->
+            <div class="yp-avatar-wrap">
+                <button type="button" class="yp-avatar" id="ypAvatar" aria-label="صورة البروفايل">
+                    <svg class="yp-avatar-icon" id="ypAvatarIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/>
+                        <path d="M4 20c0-3.87 3.58-7 8-7s8 3.13 8 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                    <div class="yp-avatar-cam-badge">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 8a2 2 0 0 1 2-2h1.2l.9-1.4A1.5 1.5 0 0 1 9.35 4h5.3a1.5 1.5 0 0 1 1.25.6L16.8 6H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                            <circle cx="12" cy="13" r="3.2" stroke="currentColor" stroke-width="1.6"/>
+                        </svg>
+                    </div>
+                    <div class="yp-avatar-spinner" id="ypAvatarSpinner"></div>
+                </button>
+                <p class="yp-avatar-uploading-label" id="ypUploadingLabel">جاري رفع صورتك...</p>
+            </div>
+
+            <!-- ===== الاسم ===== -->
+            <h2 class="yp-name" id="ypName">اسم المستخدم</h2>
+
+            <!-- ===== الإيميل ===== -->
+            <p class="yp-email" id="ypEmail">—</p>
+
+            <!-- ===== About ===== -->
+            <div class="yp-about-card">
+                <div class="yp-about-header">
+                    <span class="yp-about-label" id="ypAboutLabel">About</span>
+                    <span class="yp-about-count" id="ypAboutCount">0/140</span>
+                </div>
+                <textarea
+                    class="yp-about-input"
+                    id="ypAboutInput"
+                    maxlength="140"
+                    rows="3"
+                    placeholder="اكتب رسالة تظهر للأشخاص اللي بتكلمهم..."
+                ></textarea>
+                <button class="yp-about-save" id="ypAboutSave">حفظ</button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ===== Sheet: خيارات صورة البروفايل ===== -->
+    <div class="sheet-overlay" id="sheet-avatar-options">
+        <div class="sheet-box sheet-box-small">
+            <div class="sheet-grabber"></div>
+
+            <div class="yp-sheet-row" id="ypChangePhotoBtn">
+                <div class="yp-sheet-row-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 8a2 2 0 0 1 2-2h1.2l.9-1.4A1.5 1.5 0 0 1 9.35 4h5.3a1.5 1.5 0 0 1 1.25.6L16.8 6H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8Z"/>
+                        <circle cx="12" cy="13" r="3.2"/>
+                    </svg>
+                </div>
+                <span id="ypChangePhotoLabel">تغيير صورة البروفايل</span>
+            </div>
+
+            <div class="yp-sheet-row yp-sheet-row-danger" id="ypDeletePhotoBtn">
+                <div class="yp-sheet-row-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                        <path d="M10 11v6"></path>
+                        <path d="M14 11v6"></path>
+                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+                    </svg>
+                </div>
+                <span id="ypDeletePhotoLabel">حذف صورة البروفايل</span>
+            </div>
+
+            <p class="yp-sheet-hint" id="ypSheetHint">تقدر تغيّر صورة البروفايل مرة واحدة كل يوم.</p>
+        </div>
+    </div>
+
+    <input type="file" id="ypFileInput" accept="image/*" hidden>
+
+    <!-- ===== Toast: تم استهلاك الحد اليومي ===== -->
+    <div class="yp-toast" id="ypToast"></div>
+
+    <script type="module" src="your-profile.js"></script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<script src="lang-flash-guard.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>ChatZone — ثيمات التطبيق</title>
+<script>
+    if (!localStorage.getItem('cz_verified_email')) {
+        window.location.replace('index.html');
+    }
+</script>
+<script>
+    // نفس فكرة MainActivity.html بالظبط: تطبيق فوري للثيم واللغة
+    // المحفوظين قبل أي رسم، عشان الصفحة تتفتح بنفس شكل باقي التطبيق
+    // من غير أي "قفشة" لحظية (فلاش أبيض/غلط اتجاه).
+    (function () {
+        try {
+            var theme = localStorage.getItem('cz_theme') || 'dark';
+            var lang = localStorage.getItem('cz_lang') || 'ar';
+            var html = document.documentElement;
+            html.lang = lang;
+            html.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+            var moveToBody = function () {
+                if (!document.body) return;
+                if (theme === 'white') document.body.classList.add('theme-white');
+            };
+            if (document.body) {
+                moveToBody();
+            } else {
+                new MutationObserver(function (_, obs) {
+                    if (document.body) { moveToBody(); obs.disconnect(); }
+                }).observe(document.documentElement, { childList: true });
+            }
+        } catch (e) {}
+    })();
+</script>
+<link rel="stylesheet" href="main.css">
+<link rel="stylesheet" href="settings.css">
+<link rel="stylesheet" href="conversation.css">
+<link rel="stylesheet" href="chatzone-extra.css">
+<link rel="stylesheet" href="enhancements.css">
+<link rel="stylesheet" href="subpages.css">
+</head>
+<body>
+
+    <div class="subpage-shell">
+
+        <header class="subpage-topbar">
+            <button class="subpage-back-btn" id="subpageBackBtn" aria-label="رجوع">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+            <h1 class="subpage-title" data-i18n="themes_title">ثيمات التطبيق</h1>
+        </header>
+
+        <div class="subpage-scroll">
+
+            <p class="subpage-desc" data-i18n="themes_body">اختر ثيم ألوان للتطبيق، وسيتم حفظ اختيارك تلقائياً.</p>
+
+            <div class="theme-grid">
+                <div class="theme-option selected" id="theme-opt-dark" data-theme="dark">
+                    <div class="theme-swatch" style="background:radial-gradient(circle at 35% 35%, #1a1a2e, #06060f);"></div>
+                    <span class="theme-option-label" data-i18n="theme_dark">داكن</span>
+                    <div class="theme-option-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                </div>
+                <div class="theme-option" id="theme-opt-white" data-theme="white">
+                    <div class="theme-swatch" style="background:radial-gradient(circle at 35% 35%, #ffffff, #e8e8f5); border-color:rgba(0,0,0,0.15);"></div>
+                    <span class="theme-option-label" data-i18n="theme_white">أبيض</span>
+                    <div class="theme-option-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                </div>
+            </div>
+
+            <div class="theme-color-row" id="themeColorRow">
+                <div class="theme-color-swatch" id="themeColorSwatch"></div>
+                <span class="theme-color-label" data-i18n="theme_pick">اختر لون الثيم</span>
+                <span class="theme-color-hex" id="themeColorHex"></span>
+                <input type="color" id="themeColorPicker" value="#25D9A0">
+            </div>
+
+        </div>
+
+    </div>
+
+    <script type="module" src="settings.js"></script>
+    <script src="backnav.js"></script>
+    <script src="subpages-nav.js"></script>
+</body>
+</html>
